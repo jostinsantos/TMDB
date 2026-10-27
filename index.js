@@ -393,147 +393,137 @@ async function fetchList(path, params) {
 async function getHome() {
   return cached('home:' + lang() + ':' + region() + ':' + (excludeInTheater() ? '1' : '0'), 5 * 60e3, async () => {
     const rows = [];
-    const push = (title, items, layout) => {
-      if (!items || !items.length) return;
-      rows.push({
-        id: 'home_' + title.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/gi, ''),
-        title: title,
-        name: title,
-        layout: layout || 'poster',
-        imageStyle: layout === 'backdrop' ? 'backdrop' : 'poster',
-        type: layout === 'backdrop' ? 'hero' : 'rail',
-        items: items.slice(0, layout === 'backdrop' ? 12 : 18),
-      });
-    };
 
-    const tasks = [
-      fetchList('/trending/all/week', { page: 1 }),
-      fetchList('/trending/movie/week', { page: 1 }),
-      fetchList('/trending/tv/week', { page: 1 }),
-      fetchList('/movie/popular', digitalReleaseParams({ page: 1, region: region() }, false)),
-      fetchList('/tv/popular', digitalReleaseParams({ page: 1 }, true)),
-      fetchList('/movie/top_rated', digitalReleaseParams({ page: 1 }, false)),
-      fetchList('/tv/top_rated', digitalReleaseParams({ page: 1 }, true)),
-      fetchList('/tv/on_the_air', digitalReleaseParams({ page: 1 }, true)),
-    ];
-    if (!excludeInTheater()) {
-      tasks.push(fetchList('/movie/now_playing', { page: 1, region: region() }));
-      tasks.push(fetchList('/movie/upcoming', { page: 1, region: region() }));
-    } else {
-      tasks.push(Promise.resolve([]));
-      tasks.push(Promise.resolve([]));
-    }
-
-    const [
-      trendingAll,
-      trendingMovie,
-      trendingTv,
-      popularMovie,
-      popularTv,
-      topMovie,
-      topTv,
-      onAir,
-      nowPlaying,
-      upcoming,
-    ] = await Promise.all(tasks.map((t) => t.catch(() => [])));
-
-    // Novedades launcher: mezcla TV + movie recientes/tendencia
-    const novedades = [];
-    const seen = {};
-    function addMix(list) {
-      (list || []).forEach(function (it) {
-        if (!it || !it.id || seen[it.id]) return;
-        seen[it.id] = true;
-        novedades.push(it);
-      });
-    }
-    addMix(trendingAll);
-    addMix(trendingMovie);
-    addMix(trendingTv);
-    addMix(onAir);
-    addMix(popularMovie);
-    addMix(popularTv);
-    // Intercalar movie/tv
-    const mix = [];
-    const movies = novedades.filter((x) => x.type === 'movie');
-    const series = novedades.filter((x) => x.type === 'series' || x.type === 'tv');
-    const n = Math.max(movies.length, series.length);
-    for (let i = 0; i < n && mix.length < 20; i++) {
-      if (i < movies.length) mix.push(movies[i]);
-      if (i < series.length) mix.push(series[i]);
-    }
-    push('Novedades', mix.length ? mix : novedades, 'backdrop');
-
-    push('Destacados', trendingAll, 'backdrop');
-    if (!excludeInTheater() && nowPlaying.length) push('En cines', nowPlaying, 'backdrop');
-    push('Series en emisión', onAir, 'backdrop');
-    push('Películas en tendencia', trendingMovie, 'poster');
-    push('Series en tendencia', trendingTv, 'poster');
-    push('Películas populares', popularMovie, 'poster');
-    push('Series populares', popularTv, 'poster');
-    push('Mejor valoradas · Cine', topMovie, 'poster');
-    push('Mejor valoradas · Series', topTv, 'poster');
-    if (!excludeInTheater() && upcoming.length) push('Próximos estrenos', upcoming, 'poster');
-
-    // Géneros en home
+    // 1) Novedades: una sola fila mixta (no 3 sliders principales)
     try {
-      const action = await fetchList(
-        '/discover/movie',
-        digitalReleaseParams({ with_genres: 28, sort_by: 'popularity.desc', page: 1 }, false)
-      );
-      push('Acción', action, 'poster');
-    } catch (_) {}
-    try {
-      const dramaTv = await fetchList(
-        '/discover/tv',
-        digitalReleaseParams({ with_genres: 18, sort_by: 'popularity.desc', page: 1 }, true)
-      );
-      push('Drama en series', dramaTv, 'poster');
-    } catch (_) {}
-    try {
-      const comedy = await fetchList(
-        '/discover/movie',
-        digitalReleaseParams({ with_genres: 35, sort_by: 'popularity.desc', page: 1 }, false)
-      );
-      push('Comedia', comedy, 'poster');
-    } catch (_) {}
-
-    // Franquicias en home: 1 ítem representativo por colección (con poster de la colección)
-    try {
-      const frRows = [];
-      const sample = FRANCHISE_COLLECTIONS.slice(0, 12);
-      for (let i = 0; i < sample.length; i++) {
-        const c = sample[i];
-        try {
-          const cov = await loadCollectionCover(c.id);
-          const data = await tmdbFetch('/collection/' + c.id, {});
-          const parts = (data.parts || []).slice().sort(function (a, b) {
-            return String(a.release_date || '').localeCompare(String(b.release_date || ''));
-          });
-          let pick = parts[0];
-          if (excludeInTheater()) {
-            const today = new Date().toISOString().slice(0, 10);
-            pick = parts.filter(function (x) { return x.release_date && x.release_date <= today; }).pop() || pick;
-          }
-          if (!pick) continue;
-          const item = mapTmdbItem(pick, 'movie');
-          item.title = cov.title || c.name;
-          item.name = item.title;
-          // Portada de la franquicia
-          if (cov.poster) {
-            item.poster = cov.poster;
-            item.image = cov.poster;
-          }
-          if (cov.backdrop) {
-            item.backdrop = cov.backdrop;
-            item.background = cov.backdrop;
-          }
-          item.extra = Object.assign({}, item.extra || {}, { collectionId: c.id, catalogId: 'collection_' + c.id });
-          frRows.push(item);
-        } catch (_) {}
+      const [trAll, trMovie, trTv] = await Promise.all([
+        fetchList('/trending/all/week', { page: 1 }).catch(() => []),
+        fetchList('/trending/movie/week', { page: 1 }).catch(() => []),
+        fetchList('/trending/tv/week', { page: 1 }).catch(() => []),
+      ]);
+      const seen = {};
+      const mix = [];
+      function add(list) {
+        (list || []).forEach(function (it) {
+          if (!it || !it.id || seen[it.id]) return;
+          seen[it.id] = true;
+          mix.push(it);
+        });
       }
-      push('Franquicias', frRows, 'poster');
+      add(trAll);
+      add(trMovie);
+      add(trTv);
+      const movies = mix.filter(function (x) { return x.type === 'movie'; });
+      const series = mix.filter(function (x) { return x.type === 'series' || x.type === 'tv'; });
+      const interleaved = [];
+      const n = Math.max(movies.length, series.length);
+      for (let i = 0; i < n && interleaved.length < 18; i++) {
+        if (i < movies.length) interleaved.push(movies[i]);
+        if (i < series.length) interleaved.push(series[i]);
+      }
+      if (interleaved.length) {
+        rows.push({
+          id: 'novedades',
+          title: 'Novedades',
+          name: 'Novedades',
+          type: 'row',
+          layout: 'poster',
+          imageStyle: 'poster',
+          items: interleaved,
+        });
+      }
     } catch (_) {}
+
+    // 2) Vista de catálogos: Géneros Movie · Géneros TV · Franquicias
+    //    type: 'catalog' → la app abre CatalogDetailPage con el id del catálogo
+    const genreMovieItems = MOVIE_GENRES.map(function (g) {
+      return {
+        id: 'genre_movie_' + g.id,
+        contentId: 'genre_movie_' + g.id,
+        title: g.name,
+        name: g.name,
+        type: 'catalog',
+        media_type: 'catalog',
+        poster: null,
+        backdrop: null,
+      };
+    });
+    rows.push({
+      id: 'catalogs_genres_movie',
+      title: 'Géneros · Películas',
+      name: 'Géneros · Películas',
+      type: 'catalog',
+      layout: 'catalog',
+      imageStyle: 'backdrop',
+      items: genreMovieItems,
+    });
+
+    const genreTvItems = TV_GENRES.map(function (g) {
+      return {
+        id: 'genre_tv_' + g.id,
+        contentId: 'genre_tv_' + g.id,
+        title: g.name,
+        name: g.name,
+        type: 'catalog',
+        media_type: 'catalog',
+        poster: null,
+        backdrop: null,
+      };
+    });
+    rows.push({
+      id: 'catalogs_genres_tv',
+      title: 'Géneros · Series',
+      name: 'Géneros · Series',
+      type: 'catalog',
+      layout: 'catalog',
+      imageStyle: 'backdrop',
+      items: genreTvItems,
+    });
+
+    // Franquicias con portada de la colección
+    const franchiseItems = [];
+    const sample = FRANCHISE_COLLECTIONS.slice(0, 24);
+    const batch = 6;
+    for (let i = 0; i < sample.length; i += batch) {
+      const chunk = sample.slice(i, i + batch);
+      const covers = await Promise.all(
+        chunk.map(function (c) {
+          return loadCollectionCover(c.id).then(function (cov) {
+            return { c: c, cov: cov };
+          });
+        })
+      );
+      for (let j = 0; j < covers.length; j++) {
+        const c = covers[j].c;
+        const cov = covers[j].cov;
+        const title = cov.title || c.name;
+        const poster = cov.poster || cov.backdrop;
+        franchiseItems.push({
+          id: 'collection_' + c.id,
+          contentId: 'collection_' + c.id,
+          title: title,
+          name: title,
+          type: 'catalog',
+          media_type: 'catalog',
+          poster: poster,
+          image: poster,
+          backdrop: cov.backdrop || poster,
+          background: cov.backdrop || poster,
+          overview: cov.overview || '',
+        });
+      }
+    }
+    if (franchiseItems.length) {
+      rows.push({
+        id: 'catalogs_franchises',
+        title: 'Franquicias',
+        name: 'Franquicias',
+        type: 'catalog',
+        layout: 'catalog',
+        imageStyle: 'backdrop',
+        items: franchiseItems,
+      });
+    }
 
     return { rows: rows, sections: rows, items: rows.flatMap(function (r) { return r.items || []; }) };
   });

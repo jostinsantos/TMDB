@@ -1,21 +1,26 @@
 {
   "id": "tmdb-full-catalog",
   "name": "TMDB Full Catalog",
-  "version": "1.2.0",
-  "description": "Catálogo completo TMDB: home con novedades/géneros/franquicias, discover (tipo·género·orden), meta+logo+IMDb+IntroDB y extractores latinos embebidos.",
-  
+  "version": "1.2.1",
+  "description": "Catálogo completo TMDB: home con catálogos de géneros y franquicias, discover, meta+IntroDB y extractores latinos.",
+  "author": "community",
+  "repo": "tmdb-full-catalog",
+  "entry": "plugin.js",
+  "main": "plugin.js",
   "icon": "icon.png",
   "banner": "https://image.tmdb.org/t/p/w1280/uDgy6hyPd82kOHh6e0smXGXwPOe.jpg",
   "color": "#01B4E4",
-  "author": "community",
+  "apiVersion": 6,
+  "browser": false,
+  "section": {
+    "label": "TMDB Full"
+  },
   "languages": [
     "es",
     "es-MX",
     "es-ES",
     "en"
   ],
-  "entry": "plugin.js",
-  "main": "plugin.js",
   "capabilities": [
     "home",
     "discover",
@@ -24,23 +29,25 @@
     "streams",
     "catalogs"
   ],
-  "pages": [
+  "tabs": [
     "home",
     "discover",
     "search",
-    "meta",
-    "streams",
-    "catalogs"
+    "library",
+    "settings"
   ],
-  "types": [
-    "movie",
-    "series"
-  ],
-  "contentTypes": [
-    "movie",
-    "series"
-  ],
-  "apiVersion": 1,
+  "newsImageStyle": "banner",
+  "episodesPagination": {
+    "enabled": true,
+    "perPage": 40
+  },
+  "theme": {
+    "accent": "#01B4E4",
+    "onAccent": "#FFFFFF",
+    "background": "#0B0E14",
+    "surface": "#1A222D",
+    "highlight": "#7DD3FC"
+  },
   "config": [
     {
       "key": "tmdb_api_key",
@@ -55,12 +62,21 @@
       "label": "Idioma de metadatos",
       "type": "select",
       "default": "es-ES",
+      "description": "Idioma de títulos y descripciones.",
       "options": [
-        "es-MX",
-        "es-ES",
-        "en-US"
-      ],
-      "description": "es-MX México · es-ES España · en-US English"
+        {
+          "id": "es-MX",
+          "label": "Español (México)"
+        },
+        {
+          "id": "es-ES",
+          "label": "Español (España)"
+        },
+        {
+          "id": "en-US",
+          "label": "English"
+        }
+      ]
     },
     {
       "key": "image_quality",
@@ -68,11 +84,26 @@
       "type": "select",
       "default": "w500",
       "options": [
-        "w185",
-        "w342",
-        "w500",
-        "w780",
-        "original"
+        {
+          "id": "w185",
+          "label": "Baja (w185)"
+        },
+        {
+          "id": "w342",
+          "label": "Media (w342)"
+        },
+        {
+          "id": "w500",
+          "label": "Alta (w500)"
+        },
+        {
+          "id": "w780",
+          "label": "Muy alta (w780)"
+        },
+        {
+          "id": "original",
+          "label": "Original"
+        }
       ]
     },
     {
@@ -81,9 +112,18 @@
       "type": "select",
       "default": "w1280",
       "options": [
-        "w780",
-        "w1280",
-        "original"
+        {
+          "id": "w780",
+          "label": "w780"
+        },
+        {
+          "id": "w1280",
+          "label": "w1280"
+        },
+        {
+          "id": "original",
+          "label": "Original"
+        }
       ]
     },
     {
@@ -98,11 +138,17 @@
       "label": "Ocultar solo-en-cines (solo digital)",
       "type": "select",
       "default": "true",
+      "description": "No listar títulos que aún no tienen versión digital.",
       "options": [
-        "true",
-        "false"
-      ],
-      "description": "Nivel general: no listar títulos que aún no tienen versión digital."
+        {
+          "id": "true",
+          "label": "Sí, solo digital"
+        },
+        {
+          "id": "false",
+          "label": "No, mostrar también cines"
+        }
+      ]
     },
     {
       "key": "include_theater",
@@ -110,8 +156,14 @@
       "type": "select",
       "default": "false",
       "options": [
-        "true",
-        "false"
+        {
+          "id": "true",
+          "label": "Mostrar"
+        },
+        {
+          "id": "false",
+          "label": "Ocultar"
+        }
       ]
     },
     {
@@ -120,8 +172,14 @@
       "type": "select",
       "default": "true",
       "options": [
-        "true",
-        "false"
+        {
+          "id": "true",
+          "label": "Sí"
+        },
+        {
+          "id": "false",
+          "label": "No"
+        }
       ]
     },
     {
@@ -130,8 +188,14 @@
       "type": "select",
       "default": "true",
       "options": [
-        "true",
-        "false"
+        {
+          "id": "true",
+          "label": "Sí"
+        },
+        {
+          "id": "false",
+          "label": "No"
+        }
       ]
     },
     {
