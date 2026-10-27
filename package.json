@@ -3,7 +3,7 @@
   "name": "TMDB Full Catalog",
   "version": "1.0.0",
   "description": "Catálogo completo basado en TMDB: home, géneros, discover, meta con logo/IMDb/IntroDB e extractores latinos (HomeCine, SeriesMetro, CineCalidad, TioPlus, VerPelis, Embed69…).",
-  "logo": "https://www.themoviedb.org/assets/2/v4/logos/v2/blue_square_2-d537fb228cf3ded904ef09b136fe7382cc75f8f007dc14b240bfbee120ee867a.svg",
+  "logo": "ico.png",
   "author": "community",
   "tags": ["tmdb", "español", "latino", "catalog", "introdb"],
   "main": "index.js",
