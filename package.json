@@ -1,0 +1,80 @@
+{
+  "id": "tmdb-full-catalog",
+  "name": "TMDB Full Catalog",
+  "version": "1.0.0",
+  "description": "Catálogo completo basado en TMDB: home, géneros, discover, meta con logo/IMDb/IntroDB e extractores latinos (HomeCine, SeriesMetro, CineCalidad, TioPlus, VerPelis, Embed69…).",
+  "logo": "https://www.themoviedb.org/assets/2/v4/logos/v2/blue_square_2-d537fb228cf3ded904ef09b136fe7382cc75f8f007dc14b240bfbee120ee867a.svg",
+  "author": "community",
+  "tags": ["tmdb", "español", "latino", "catalog", "introdb"],
+  "main": "index.js",
+  "types": ["catalog", "meta", "stream"],
+  "resources": ["catalog", "meta", "stream"],
+  "contentTypes": ["movie", "series"],
+  "language": "es",
+  "config": {
+    "tmdb_api_key": {
+      "type": "string",
+      "label": "API Key TMDB (opcional)",
+      "default": ""
+    },
+    "tmdb_lang": {
+      "type": "select",
+      "label": "Idioma",
+      "options": ["es-MX", "es-ES", "en-US"],
+      "default": "es-ES"
+    },
+    "image_quality": {
+      "type": "select",
+      "label": "Calidad posters",
+      "options": ["w185", "w342", "w500", "w780", "original"],
+      "default": "w500"
+    },
+    "backdrop_quality": {
+      "type": "select",
+      "label": "Calidad backdrops",
+      "options": ["w780", "w1280", "original"],
+      "default": "w1280"
+    },
+    "region": {
+      "type": "string",
+      "label": "Región",
+      "default": "ES"
+    },
+    "include_theater": {
+      "type": "boolean",
+      "label": "Incluir en cines",
+      "default": true
+    },
+    "only_digital": {
+      "type": "boolean",
+      "label": "Solo digital / ya lanzados",
+      "default": false
+    },
+    "hide_unreleased_eps": {
+      "type": "boolean",
+      "label": "Ocultar capítulos no estrenados",
+      "default": true
+    },
+    "enabled_sources": {
+      "type": "string",
+      "label": "Extractores (coma)",
+      "default": "embed69,vimeus,lamovie,elifilms,homecine,seriesmetro,cinecalidad,tioplus,verpelis"
+    },
+    "max_concurrent_sources": {
+      "type": "number",
+      "label": "Paralelo",
+      "default": 3
+    }
+  },
+  "addons": [
+    { "id": "src-embed69", "path": "sources/embed69", "type": "source", "name": "Embed69" },
+    { "id": "src-vimeus", "path": "sources/vimeus", "type": "source", "name": "Vimeus" },
+    { "id": "src-lamovie", "path": "sources/lamovie", "type": "source", "name": "LaMovie" },
+    { "id": "src-elifilms", "path": "sources/elifilms", "type": "source", "name": "EliFilms" },
+    { "id": "src-homecine", "path": "sources/homecine", "type": "source", "name": "HomeCine" },
+    { "id": "src-seriesmetro", "path": "sources/seriesmetro", "type": "source", "name": "SeriesMetro" },
+    { "id": "src-cinecalidad", "path": "sources/cinecalidad", "type": "source", "name": "CineCalidad" },
+    { "id": "src-tioplus", "path": "sources/tioplus", "type": "source", "name": "TioPlus" },
+    { "id": "src-verpelis", "path": "sources/verpelis", "type": "source", "name": "VerPelis" }
+  ]
+}
