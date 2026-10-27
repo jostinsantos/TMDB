@@ -1,0 +1,31 @@
+{
+  "apiVersion": 1,
+  "maxApiVersion": 2,
+  "capabilities": {
+    "names": [
+      "home",
+      "discover",
+      "search",
+      "meta",
+      "streams",
+      "catalogs",
+      "getHome",
+      "getDiscover",
+      "getDiscoverFilters",
+      "getCatalogs",
+      "getCatalog",
+      "getMeta",
+      "getStreams"
+    ],
+    "required": ["home", "meta", "streams"],
+    "needsApproval": []
+  },
+  "browser": false,
+  "telemetry": false,
+  "categories": ["movies", "series", "latino", "tmdb"],
+  "manifest": {
+    "id": "tmdb-full-catalog",
+    "name": "TMDB Full Catalog",
+    "entry": "plugin.js"
+  }
+}

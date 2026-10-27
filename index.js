@@ -32,14 +32,15 @@ const DEFAULTS = {
   tmdb_lang: 'es-ES',
   image_quality: 'w500',
   backdrop_quality: 'w1280',
-  include_theater: 'true',
-  only_digital: 'false',
+  include_theater: 'false',
+  only_digital: 'true',
   hide_unreleased_eps: 'true',
+  exclude_in_theater: 'true',
   // Todos los servidores activos a la vez (el usuario puede recortar la lista)
   enabled_sources:
-    'embed69,vimeus,lamovie,elifilms,homecine,seriesmetro,cinecalidad,tioplus,verpelis,' +
-    'fuegocine,pelisgo,pelispanda,cine24h,cinemitas,pelisplus,hackstore,' +
-    'peliculasflix,pelisgratishd,areshd,entrepeliculasyseries,sololatino',
+    'embed69,homecine,seriesmetro,cinecalidad,verpelis,vimeus,lamovie,elifilms,tioplus,' +
+    'cine24h,cinemitas,hackstore,areshd,sololatino,pelisgratishd,peliculasflix,' +
+    'entrepeliculasyseries,pelisgo,fuegocine',
   max_concurrent_sources: '4',
   region: 'ES',
 };
@@ -161,8 +162,31 @@ function includeTheater() {
 }
 
 function onlyDigital() {
-  return truthy(getConfig('only_digital', 'false'));
+  return truthy(getConfig('only_digital', 'true'));
 }
+function excludeInTheater() {
+  // Preferencia general: no mostrar lo que sigue solo en cines
+  if (truthy(getConfig('exclude_in_theater', 'true'))) return true;
+  // Compat: only_digital / include_theater invertido
+  if (truthy(getConfig('only_digital', 'true'))) return true;
+  if (!truthy(getConfig('include_theater', 'false'))) return true;
+  return false;
+}
+
+function digitalReleaseParams(params, isTv) {
+  params = params || {};
+  if (!excludeInTheater()) return params;
+  const today = new Date().toISOString().slice(0, 10);
+  if (isTv) {
+    params['first_air_date.lte'] = today;
+  } else {
+    // Tipos digitales/físicos/TV (no solo estreno en sala)
+    params.with_release_type = '4|5|6';
+    params['primary_release_date.lte'] = today;
+  }
+  return params;
+}
+
 
 function hideUnreleasedEps() {
   return truthy(getConfig('hide_unreleased_eps', 'true'));
@@ -367,78 +391,154 @@ async function fetchList(path, params) {
  * - Otras en poster vertical
  */
 async function getHome() {
-  return cached('home:' + lang() + ':' + region(), 5 * 60e3, async () => {
+  return cached('home:' + lang() + ':' + region() + ':' + (excludeInTheater() ? '1' : '0'), 5 * 60e3, async () => {
     const rows = [];
     const push = (title, items, layout) => {
       if (!items || !items.length) return;
       rows.push({
-        id: 'home_' + title.toLowerCase().replace(/\s+/g, '_'),
-        title,
+        id: 'home_' + title.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/gi, ''),
+        title: title,
         name: title,
-        layout: layout || 'poster', // 'backdrop' | 'poster'
+        layout: layout || 'poster',
+        imageStyle: layout === 'backdrop' ? 'backdrop' : 'poster',
+        type: layout === 'backdrop' ? 'hero' : 'rail',
         items: items.slice(0, layout === 'backdrop' ? 12 : 18),
       });
     };
+
+    const tasks = [
+      fetchList('/trending/all/week', { page: 1 }),
+      fetchList('/trending/movie/week', { page: 1 }),
+      fetchList('/trending/tv/week', { page: 1 }),
+      fetchList('/movie/popular', digitalReleaseParams({ page: 1, region: region() }, false)),
+      fetchList('/tv/popular', digitalReleaseParams({ page: 1 }, true)),
+      fetchList('/movie/top_rated', digitalReleaseParams({ page: 1 }, false)),
+      fetchList('/tv/top_rated', digitalReleaseParams({ page: 1 }, true)),
+      fetchList('/tv/on_the_air', digitalReleaseParams({ page: 1 }, true)),
+    ];
+    if (!excludeInTheater()) {
+      tasks.push(fetchList('/movie/now_playing', { page: 1, region: region() }));
+      tasks.push(fetchList('/movie/upcoming', { page: 1, region: region() }));
+    } else {
+      tasks.push(Promise.resolve([]));
+      tasks.push(Promise.resolve([]));
+    }
 
     const [
       trendingAll,
       trendingMovie,
       trendingTv,
-      nowPlaying,
       popularMovie,
       popularTv,
       topMovie,
       topTv,
-      upcoming,
       onAir,
-    ] = await Promise.all([
-      fetchList('/trending/all/week', { page: 1 }).catch(() => []),
-      fetchList('/trending/movie/week', { page: 1 }).catch(() => []),
-      fetchList('/trending/tv/week', { page: 1 }).catch(() => []),
-      fetchList('/movie/now_playing', { page: 1, region: region() }).catch(() => []),
-      fetchList('/movie/popular', { page: 1, region: region() }).catch(() => []),
-      fetchList('/tv/popular', { page: 1 }).catch(() => []),
-      fetchList('/movie/top_rated', { page: 1 }).catch(() => []),
-      fetchList('/tv/top_rated', { page: 1 }).catch(() => []),
-      fetchList('/movie/upcoming', { page: 1, region: region() }).catch(() => []),
-      fetchList('/tv/on_the_air', { page: 1 }).catch(() => []),
-    ]);
+      nowPlaying,
+      upcoming,
+    ] = await Promise.all(tasks.map((t) => t.catch(() => [])));
 
-    // Hero / horizontal backdrop
+    // Novedades launcher: mezcla TV + movie recientes/tendencia
+    const novedades = [];
+    const seen = {};
+    function addMix(list) {
+      (list || []).forEach(function (it) {
+        if (!it || !it.id || seen[it.id]) return;
+        seen[it.id] = true;
+        novedades.push(it);
+      });
+    }
+    addMix(trendingAll);
+    addMix(trendingMovie);
+    addMix(trendingTv);
+    addMix(onAir);
+    addMix(popularMovie);
+    addMix(popularTv);
+    // Intercalar movie/tv
+    const mix = [];
+    const movies = novedades.filter((x) => x.type === 'movie');
+    const series = novedades.filter((x) => x.type === 'series' || x.type === 'tv');
+    const n = Math.max(movies.length, series.length);
+    for (let i = 0; i < n && mix.length < 20; i++) {
+      if (i < movies.length) mix.push(movies[i]);
+      if (i < series.length) mix.push(series[i]);
+    }
+    push('Novedades', mix.length ? mix : novedades, 'backdrop');
+
     push('Destacados', trendingAll, 'backdrop');
-    if (includeTheater()) push('En cines', nowPlaying, 'backdrop');
+    if (!excludeInTheater() && nowPlaying.length) push('En cines', nowPlaying, 'backdrop');
     push('Series en emisión', onAir, 'backdrop');
-
-    // Poster grids
     push('Películas en tendencia', trendingMovie, 'poster');
     push('Series en tendencia', trendingTv, 'poster');
     push('Películas populares', popularMovie, 'poster');
     push('Series populares', popularTv, 'poster');
     push('Mejor valoradas · Cine', topMovie, 'poster');
     push('Mejor valoradas · Series', topTv, 'poster');
-    if (!onlyDigital()) push('Próximos estrenos', upcoming, 'poster');
+    if (!excludeInTheater() && upcoming.length) push('Próximos estrenos', upcoming, 'poster');
 
-    // Géneros rápidos (sample)
+    // Géneros en home
     try {
-      const action = await fetchList('/discover/movie', {
-        with_genres: 28,
-        sort_by: 'popularity.desc',
-        page: 1,
-      });
+      const action = await fetchList(
+        '/discover/movie',
+        digitalReleaseParams({ with_genres: 28, sort_by: 'popularity.desc', page: 1 }, false)
+      );
       push('Acción', action, 'poster');
     } catch (_) {}
     try {
-      const dramaTv = await fetchList('/discover/tv', {
-        with_genres: 18,
-        sort_by: 'popularity.desc',
-        page: 1,
-      });
+      const dramaTv = await fetchList(
+        '/discover/tv',
+        digitalReleaseParams({ with_genres: 18, sort_by: 'popularity.desc', page: 1 }, true)
+      );
       push('Drama en series', dramaTv, 'poster');
     } catch (_) {}
+    try {
+      const comedy = await fetchList(
+        '/discover/movie',
+        digitalReleaseParams({ with_genres: 35, sort_by: 'popularity.desc', page: 1 }, false)
+      );
+      push('Comedia', comedy, 'poster');
+    } catch (_) {}
 
-    return { rows, sections: rows, items: rows.flatMap((r) => r.items || []) };
+    // Franquicias en home: 1 ítem representativo por colección (con poster de la colección)
+    try {
+      const frRows = [];
+      const sample = FRANCHISE_COLLECTIONS.slice(0, 12);
+      for (let i = 0; i < sample.length; i++) {
+        const c = sample[i];
+        try {
+          const cov = await loadCollectionCover(c.id);
+          const data = await tmdbFetch('/collection/' + c.id, {});
+          const parts = (data.parts || []).slice().sort(function (a, b) {
+            return String(a.release_date || '').localeCompare(String(b.release_date || ''));
+          });
+          let pick = parts[0];
+          if (excludeInTheater()) {
+            const today = new Date().toISOString().slice(0, 10);
+            pick = parts.filter(function (x) { return x.release_date && x.release_date <= today; }).pop() || pick;
+          }
+          if (!pick) continue;
+          const item = mapTmdbItem(pick, 'movie');
+          item.title = cov.title || c.name;
+          item.name = item.title;
+          // Portada de la franquicia
+          if (cov.poster) {
+            item.poster = cov.poster;
+            item.image = cov.poster;
+          }
+          if (cov.backdrop) {
+            item.backdrop = cov.backdrop;
+            item.background = cov.backdrop;
+          }
+          item.extra = Object.assign({}, item.extra || {}, { collectionId: c.id, catalogId: 'collection_' + c.id });
+          frRows.push(item);
+        } catch (_) {}
+      }
+      push('Franquicias', frRows, 'poster');
+    } catch (_) {}
+
+    return { rows: rows, sections: rows, items: rows.flatMap(function (r) { return r.items || []; }) };
   });
 }
+
 
 // ─── Catalogs ─────────────────────────────────────────────────────────────
 /** Caché de portadas de colecciones (poster/backdrop TMDB). */
@@ -662,135 +762,92 @@ async function getCatalog(catalogId, opts) {
  *  3) sort: fecha, valoración, letras, popularidad…
  */
 async function getDiscoverFilters() {
-  const filters = [
-    { id: 'type', title: 'Tipo', group: 'type', options: [
-      { id: 'movie', title: 'Películas' },
-      { id: 'tv', title: 'Series' },
-    ]},
+  // La app solo muestra hasta 3 filtros, cada uno con { id, label, options:[{id,label}] }
+  const typeOpts = [
+    { id: 'movie', label: 'Películas' },
+    { id: 'tv', label: 'Series' },
   ];
 
-  // Géneros movie
-  for (const g of MOVIE_GENRES) {
-    filters.push({
-      id: 'genre_movie_' + g.id,
-      title: g.name,
-      group: 'genre_movie',
-      parent: 'movie',
-    });
-  }
-  // Géneros TV
-  for (const g of TV_GENRES) {
-    filters.push({
-      id: 'genre_tv_' + g.id,
-      title: g.name,
-      group: 'genre_tv',
-      parent: 'tv',
-    });
-  }
-  // Orden
-  for (const s of SORT_OPTIONS) {
-    filters.push({
-      id: 'sort_' + s.id,
-      title: s.title,
-      group: 'sort',
-    });
-  }
+  const genreMovie = MOVIE_GENRES.map(function (g) {
+    return { id: 'm' + g.id, label: g.name };
+  });
+  const genreTv = TV_GENRES.map(function (g) {
+    return { id: 't' + g.id, label: g.name };
+  });
+  // Un solo select de género con prefijo m/t para distinguir
+  const genreOpts = [{ id: 'all', label: 'Todos' }]
+    .concat(genreMovie.map(function (g) { return { id: g.id, label: '🎬 ' + g.label }; }))
+    .concat(genreTv.map(function (g) { return { id: g.id, label: '📺 ' + g.label }; }));
 
-  // También planos para apps que solo lean id/title
-  return filters.concat([
-    { id: 'movie', title: 'Películas', group: 'type' },
-    { id: 'tv', title: 'Series', group: 'type' },
-    ...MOVIE_GENRES.map((g) => ({
-      id: 'genre:' + g.id + ':movie',
-      title: '🎬 ' + g.name,
-      group: 'Géneros cine',
-    })),
-    ...TV_GENRES.map((g) => ({
-      id: 'genre:' + g.id + ':tv',
-      title: '📺 ' + g.name,
-      group: 'Géneros series',
-    })),
-    ...SORT_OPTIONS.map((s) => ({
-      id: 'sort:' + s.id,
-      title: s.title,
-      group: 'Ordenar',
-    })),
-  ]);
+  const sortOpts = [
+    { id: 'popularity.desc', label: 'Popularidad ↓' },
+    { id: 'popularity.asc', label: 'Popularidad ↑' },
+    { id: 'vote_average.desc', label: 'Valoración ↓' },
+    { id: 'vote_average.asc', label: 'Valoración ↑' },
+    { id: 'date.desc', label: 'Fecha ↓' },
+    { id: 'date.asc', label: 'Fecha ↑' },
+    { id: 'title.asc', label: 'Título A–Z' },
+    { id: 'title.desc', label: 'Título Z–A' },
+    { id: 'revenue.desc', label: 'Recaudación ↓' },
+  ];
+
+  return [
+    { id: 'type', label: 'Tipo', options: typeOpts },
+    { id: 'genre', label: 'Género', options: genreOpts },
+    { id: 'sort', label: 'Ordenar', options: sortOpts },
+  ];
 }
+
 
 async function getDiscover(opts) {
   opts = opts || {};
   const page = parseInt(opts.page || 1, 10) || 1;
 
-  // Aceptar varios nombres de filtro desde la app
-  let type = String(
-    opts.type || opts.kind || opts.media || ''
-  ).toLowerCase();
+  // App envía { page, type, genre, sort } según ids de getDiscoverFilters
+  let type = String(opts.type || opts.kind || opts.media || 'movie').toLowerCase();
   let genre = String(opts.genre || opts.genreId || opts.with_genres || '').trim();
-  let sort = String(opts.sort || opts.sort_by || opts.order || '').trim();
-  const filter = String(
-    opts.filter || opts.catalog || opts.category || ''
-  ).trim();
+  let sort = String(opts.sort || opts.sort_by || opts.order || 'popularity.desc').trim();
+  const filter = String(opts.filter || opts.catalog || opts.category || '').trim();
 
-  // Parse filter compuesto: "movie", "tv", "genre:28:movie", "sort:vote_average.desc"
-  if (filter) {
-    if (filter === 'movie' || filter === 'tv') type = filter;
-    const gm = filter.match(/^genre[:_](\d+)(?::(movie|tv))?/i);
-    if (gm) {
-      genre = gm[1];
-      if (gm[2]) type = gm[2].toLowerCase();
-    }
-    if (/^genre_movie_(\d+)$/i.test(filter)) {
-      genre = RegExp.$1;
-      type = 'movie';
-    }
-    if (/^genre_tv_(\d+)$/i.test(filter)) {
-      genre = RegExp.$1;
-      type = 'tv';
-    }
-    const sm = filter.match(/^sort[:_](.+)$/i);
-    if (sm) sort = sm[1];
+  if (filter === 'movie' || filter === 'tv') type = filter;
+  if (type === 'series' || type === 'show') type = 'tv';
+  if (type !== 'tv') type = 'movie';
+
+  // Género con prefijo m28 / t18
+  if (/^m\d+$/i.test(genre)) {
+    type = 'movie';
+    genre = genre.slice(1);
+  } else if (/^t\d+$/i.test(genre)) {
+    type = 'tv';
+    genre = genre.slice(1);
+  } else if (genre === 'all') {
+    genre = '';
   }
 
-  if (type !== 'tv' && type !== 'series') type = type === 'movie' ? 'movie' : type || 'movie';
-  if (type === 'series') type = 'tv';
-
-  // Normalizar sort según tipo
-  if (!sort) sort = 'popularity.desc';
+  // Orden genérico date/title → campo TMDB
+  if (sort === 'date.desc') sort = type === 'tv' ? 'first_air_date.desc' : 'primary_release_date.desc';
+  if (sort === 'date.asc') sort = type === 'tv' ? 'first_air_date.asc' : 'primary_release_date.asc';
+  if (sort === 'title.asc') sort = type === 'tv' ? 'name.asc' : 'original_title.asc';
+  if (sort === 'title.desc') sort = type === 'tv' ? 'name.desc' : 'original_title.desc';
   if (type === 'tv') {
-    sort = sort
-      .replace('primary_release_date', 'first_air_date')
-      .replace('original_title', 'name')
-      .replace(/^title\./, 'name.');
+    sort = sort.replace('primary_release_date', 'first_air_date').replace('original_title', 'name');
   } else {
-    sort = sort
-      .replace('first_air_date', 'primary_release_date')
-      .replace(/^name\./, 'original_title.');
+    sort = sort.replace('first_air_date', 'primary_release_date');
   }
+  if (!sort) sort = 'popularity.desc';
 
   const path = type === 'tv' ? '/discover/tv' : '/discover/movie';
-  const params = {
-    page,
+  let params = {
+    page: page,
     sort_by: sort,
     include_adult: false,
     region: region(),
   };
   if (genre) params.with_genres = genre;
-
-  if (onlyDigital()) {
-    const today = new Date().toISOString().slice(0, 10);
-    if (type === 'tv') params['first_air_date.lte'] = today;
-    else params['primary_release_date.lte'] = today;
-  }
-
-  if (!includeTheater() && type === 'movie') {
-    // Preferir digital / wide: con fecha de release ya pasada y no solo theater
-    // TMDB no tiene flag perfecto; usamos release date <= hoy
-    params['primary_release_date.lte'] = new Date().toISOString().slice(0, 10);
-  }
+  params = digitalReleaseParams(params, type === 'tv');
 
   return cached(
-    'disc:' + type + ':' + genre + ':' + sort + ':' + page + ':' + lang(),
+    'disc:' + type + ':' + genre + ':' + sort + ':' + page + ':' + lang() + ':' + (excludeInTheater() ? '1' : '0'),
     90e3,
     async () => {
       const data = await tmdbFetch(path, params);
@@ -799,16 +856,17 @@ async function getDiscover(opts) {
       );
       const totalPages = data.total_pages || 1;
       return {
-        items,
+        items: items,
         metas: items,
         results: items,
-        page,
-        totalPages,
+        page: page,
+        totalPages: totalPages,
         hasMore: page < totalPages,
       };
     }
   );
 }
+
 
 // ─── Meta (logo, seasons, all episodes, IMDb) ─────────────────────────────
 const imdbByTmdb = new Map(); // "movie:123" | "tv:123" → tt…
@@ -1379,16 +1437,22 @@ function getConfigSchema() {
         default: 'ES',
       },
       {
+        key: 'exclude_in_theater',
+        type: 'boolean',
+        label: 'Ocultar contenido solo en cines (solo digital)',
+        default: true,
+      },
+      {
         key: 'include_theater',
         type: 'boolean',
-        label: 'Incluir “En cines”',
-        default: true,
+        label: 'Incluir fila “En cines” en Home',
+        default: false,
       },
       {
         key: 'only_digital',
         type: 'boolean',
-        label: 'Solo estrenos digitales / ya lanzados',
-        default: false,
+        label: 'Solo fechas ya lanzadas',
+        default: true,
       },
       {
         key: 'hide_unreleased_eps',

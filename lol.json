@@ -1,80 +1,151 @@
 {
   "id": "tmdb-full-catalog",
   "name": "TMDB Full Catalog",
-  "version": "1.0.0",
-  "description": "Catálogo completo basado en TMDB: home, géneros, discover, meta con logo/IMDb/IntroDB e extractores latinos (HomeCine, SeriesMetro, CineCalidad, TioPlus, VerPelis, Embed69…).",
-  "logo": "ico.png",
+  "version": "1.2.0",
+  "description": "Catálogo completo TMDB: home con novedades/géneros/franquicias, discover (tipo·género·orden), meta+logo+IMDb+IntroDB y extractores latinos embebidos.",
+  "logo": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://themoviedb.org&size=128",
+  "icon": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://themoviedb.org&size=128",
+  "banner": "https://image.tmdb.org/t/p/w1280/uDgy6hyPd82kOHh6e0smXGXwPOe.jpg",
+  "color": "#01B4E4",
   "author": "community",
-  "tags": ["tmdb", "español", "latino", "catalog", "introdb"],
-  "main": "index.js",
-  "types": ["catalog", "meta", "stream"],
-  "resources": ["catalog", "meta", "stream"],
-  "contentTypes": ["movie", "series"],
-  "language": "es",
-  "config": {
-    "tmdb_api_key": {
-      "type": "string",
+  "languages": [
+    "es",
+    "es-MX",
+    "es-ES",
+    "en"
+  ],
+  "entry": "plugin.js",
+  "main": "plugin.js",
+  "capabilities": [
+    "home",
+    "discover",
+    "search",
+    "meta",
+    "streams",
+    "catalogs"
+  ],
+  "pages": [
+    "home",
+    "discover",
+    "search",
+    "meta",
+    "streams",
+    "catalogs"
+  ],
+  "types": [
+    "movie",
+    "series"
+  ],
+  "contentTypes": [
+    "movie",
+    "series"
+  ],
+  "apiVersion": 1,
+  "config": [
+    {
+      "key": "tmdb_api_key",
       "label": "API Key TMDB (opcional)",
-      "default": ""
+      "type": "text",
+      "default": "",
+      "placeholder": "Vacío = clave del addon",
+      "description": "Tu propia API key de themoviedb.org si la tienes."
     },
-    "tmdb_lang": {
+    {
+      "key": "tmdb_lang",
+      "label": "Idioma de metadatos",
       "type": "select",
-      "label": "Idioma",
-      "options": ["es-MX", "es-ES", "en-US"],
-      "default": "es-ES"
+      "default": "es-ES",
+      "options": [
+        "es-MX",
+        "es-ES",
+        "en-US"
+      ],
+      "description": "es-MX México · es-ES España · en-US English"
     },
-    "image_quality": {
+    {
+      "key": "image_quality",
+      "label": "Calidad de posters",
       "type": "select",
-      "label": "Calidad posters",
-      "options": ["w185", "w342", "w500", "w780", "original"],
-      "default": "w500"
+      "default": "w500",
+      "options": [
+        "w185",
+        "w342",
+        "w500",
+        "w780",
+        "original"
+      ]
     },
-    "backdrop_quality": {
+    {
+      "key": "backdrop_quality",
+      "label": "Calidad de backdrops",
       "type": "select",
-      "label": "Calidad backdrops",
-      "options": ["w780", "w1280", "original"],
-      "default": "w1280"
+      "default": "w1280",
+      "options": [
+        "w780",
+        "w1280",
+        "original"
+      ]
     },
-    "region": {
-      "type": "string",
-      "label": "Región",
-      "default": "ES"
+    {
+      "key": "region",
+      "label": "Región TMDB",
+      "type": "text",
+      "default": "ES",
+      "placeholder": "ES, MX, US, AR…"
     },
-    "include_theater": {
-      "type": "boolean",
-      "label": "Incluir en cines",
-      "default": true
+    {
+      "key": "exclude_in_theater",
+      "label": "Ocultar solo-en-cines (solo digital)",
+      "type": "select",
+      "default": "true",
+      "options": [
+        "true",
+        "false"
+      ],
+      "description": "Nivel general: no listar títulos que aún no tienen versión digital."
     },
-    "only_digital": {
-      "type": "boolean",
-      "label": "Solo digital / ya lanzados",
-      "default": false
+    {
+      "key": "include_theater",
+      "label": "Mostrar fila En cines en Home",
+      "type": "select",
+      "default": "false",
+      "options": [
+        "true",
+        "false"
+      ]
     },
-    "hide_unreleased_eps": {
-      "type": "boolean",
+    {
+      "key": "only_digital",
+      "label": "Solo fechas ya lanzadas",
+      "type": "select",
+      "default": "true",
+      "options": [
+        "true",
+        "false"
+      ]
+    },
+    {
+      "key": "hide_unreleased_eps",
       "label": "Ocultar capítulos no estrenados",
-      "default": true
+      "type": "select",
+      "default": "true",
+      "options": [
+        "true",
+        "false"
+      ]
     },
-    "enabled_sources": {
-      "type": "string",
-      "label": "Extractores (coma)",
-      "default": "embed69,vimeus,lamovie,elifilms,homecine,seriesmetro,cinecalidad,tioplus,verpelis"
+    {
+      "key": "enabled_sources",
+      "label": "Extractores activos (coma)",
+      "type": "text",
+      "default": "embed69,homecine,seriesmetro,cinecalidad,verpelis,vimeus,lamovie,elifilms,tioplus,cine24h,cinemitas,hackstore,areshd,sololatino,pelisgratishd,peliculasflix,entrepeliculasyseries,pelisgo,fuegocine",
+      "description": "Quita nombres para desactivar servidores."
     },
-    "max_concurrent_sources": {
+    {
+      "key": "max_concurrent_sources",
+      "label": "Extractores en paralelo",
       "type": "number",
-      "label": "Paralelo",
-      "default": 3
+      "default": "4"
     }
-  },
-  "addons": [
-    { "id": "src-embed69", "path": "sources/embed69", "type": "source", "name": "Embed69" },
-    { "id": "src-vimeus", "path": "sources/vimeus", "type": "source", "name": "Vimeus" },
-    { "id": "src-lamovie", "path": "sources/lamovie", "type": "source", "name": "LaMovie" },
-    { "id": "src-elifilms", "path": "sources/elifilms", "type": "source", "name": "EliFilms" },
-    { "id": "src-homecine", "path": "sources/homecine", "type": "source", "name": "HomeCine" },
-    { "id": "src-seriesmetro", "path": "sources/seriesmetro", "type": "source", "name": "SeriesMetro" },
-    { "id": "src-cinecalidad", "path": "sources/cinecalidad", "type": "source", "name": "CineCalidad" },
-    { "id": "src-tioplus", "path": "sources/tioplus", "type": "source", "name": "TioPlus" },
-    { "id": "src-verpelis", "path": "sources/verpelis", "type": "source", "name": "VerPelis" }
   ]
 }
