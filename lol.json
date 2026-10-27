@@ -1,7 +1,7 @@
 {
   "id": "tmdb-full-catalog",
   "name": "TMDB Full Catalog",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Catálogo completo TMDB: home con catálogos de géneros y franquicias, discover, meta+IntroDB y extractores latinos.",
   "author": "community",
   "repo": "tmdb-full-catalog",
@@ -61,7 +61,7 @@
       "key": "tmdb_lang",
       "label": "Idioma de metadatos",
       "type": "select",
-      "default": "es-ES",
+      "default": "es-MX",
       "description": "Idioma de títulos y descripciones.",
       "options": [
         {
@@ -130,7 +130,7 @@
       "key": "region",
       "label": "Región TMDB",
       "type": "text",
-      "default": "ES",
+      "default": "MX",
       "placeholder": "ES, MX, US, AR…"
     },
     {
