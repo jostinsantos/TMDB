@@ -3,8 +3,8 @@
   "name": "TMDB Full Catalog",
   "version": "1.2.0",
   "description": "Catálogo completo TMDB: home con novedades/géneros/franquicias, discover (tipo·género·orden), meta+logo+IMDb+IntroDB y extractores latinos embebidos.",
-  "logo": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://themoviedb.org&size=128",
-  "icon": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://themoviedb.org&size=128",
+  
+  "icon": "icon.png",
   "banner": "https://image.tmdb.org/t/p/w1280/uDgy6hyPd82kOHh6e0smXGXwPOe.jpg",
   "color": "#01B4E4",
   "author": "community",
