@@ -3,29 +3,29 @@ var __EXTRACTOR_SOURCES = {"embed69": "/**\n * embed69 - Built from src/embed69/
 
 /**
  * TMDB Full Catalog Addon
- * ───────────────────────
+ * â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
  * Base de datos: The Movie Database (TMDB) completo.
  * - Home con filas mixtas (backdrop horizontal + posters)
- * - Catálogos por género (movie / TV)
- * - Discover: tipo · género · orden
+ * - CatÃ¡logos por gÃ©nero (movie / TV)
+ * - Discover: tipo Â· gÃ©nero Â· orden
  * - Meta completa: logo, temporadas, episodios, IMDb
- * - Intro/Outro vía IntroDB (imdb_id → player.segments)
+ * - Intro/Outro vÃ­a IntroDB (imdb_id â†’ player.segments)
  * - Streams: extractores latinos (HomeCine, SeriesMetro, CineCalidad,
  *   TioPlus, VerPelis, Embed69, Vimeus, LaMovie, EliFilms, FuegoCine,
- *   PelisGo, PelisPanda, Cine24h, Cinemitas, PelisPlus, HackStore, …)
- * - Catálogos de colecciones / franquicias con portada de la colección
+ *   PelisGo, PelisPanda, Cine24h, Cinemitas, PelisPlus, HackStore, â€¦)
+ * - CatÃ¡logos de colecciones / franquicias con portada de la colecciÃ³n
  *
- * Configuración (userConfig / __nuvioConfig):
- *   tmdb_api_key          — clave propia (vacío = default del addon)
- *   tmdb_lang             — es-MX | es-ES | en-US
- *   image_quality         — w185 | w342 | w500 | w780 | original
- *   backdrop_quality      — w780 | w1280 | original
- *   include_theater       — true/false (en cines)
- *   only_digital          — true/false (solo con fecha digital/release)
- *   hide_unreleased_eps   — true/false (ocultar capítulos futuros)
- *   enabled_sources       — lista separada por comas (todos los extractores)
- *   max_concurrent_sources— número (default 4)
- *   region                — código región TMDB (ES, MX, US…)
+ * ConfiguraciÃ³n (userConfig / __nuvioConfig):
+ *   tmdb_api_key          â€” clave propia (vacÃ­o = default del addon)
+ *   tmdb_lang             â€” es-MX | es-ES | en-US
+ *   image_quality         â€” w185 | w342 | w500 | w780 | original
+ *   backdrop_quality      â€” w780 | w1280 | original
+ *   include_theater       â€” true/false (en cines)
+ *   only_digital          â€” true/false (solo con fecha digital/release)
+ *   hide_unreleased_eps   â€” true/false (ocultar capÃ­tulos futuros)
+ *   enabled_sources       â€” lista separada por comas (todos los extractores)
+ *   max_concurrent_sourcesâ€” nÃºmero (default 4)
+ *   region                â€” cÃ³digo regiÃ³n TMDB (ES, MX, USâ€¦)
  */
 'use strict';
 
@@ -51,7 +51,7 @@ const DEFAULTS = {
 /** Franquicias / colecciones TMDB (id + nombre). La portada se obtiene de /collection/{id}. */
 const FRANCHISE_COLLECTIONS = [
   { id: 10, name: 'Star Wars' },
-  { id: 119, name: 'El Señor de los Anillos' },
+  { id: 119, name: 'El SeÃ±or de los Anillos' },
   { id: 1241, name: 'Harry Potter' },
   { id: 295, name: 'Piratas del Caribe' },
   { id: 328, name: 'Jurassic Park' },
@@ -105,8 +105,9 @@ const FRANCHISE_COLLECTIONS = [
 const IMG = 'https://image.tmdb.org/t/p/';
 const TMDB = 'https://api.themoviedb.org/3';
 const INTRODB = 'https://api.introdb.app/segments';
+const OPENSUBTITLES = 'https://opensubtitles-v3.strem.io/subtitles';
 
-// ─── Config ───────────────────────────────────────────────────────────────
+// â”€â”€â”€ Config â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function cfg() {
   let supplied = {};
   try {
@@ -157,7 +158,7 @@ function region() {
 }
 
 function truthy(v) {
-  return /^(1|true|yes|on|si|sí)$/i.test(String(v == null ? '' : v).trim());
+  return /^(1|true|yes|on|si|sÃ­)$/i.test(String(v == null ? '' : v).trim());
 }
 
 function includeTheater() {
@@ -183,7 +184,7 @@ function digitalReleaseParams(params, isTv) {
   if (isTv) {
     params['first_air_date.lte'] = today;
   } else {
-    // Tipos digitales/físicos/TV (no solo estreno en sala)
+    // Tipos digitales/fÃ­sicos/TV (no solo estreno en sala)
     params.with_release_type = '4|5|6';
     params['primary_release_date.lte'] = today;
   }
@@ -207,7 +208,7 @@ function maxConcurrent() {
   return Number.isFinite(n) && n > 0 ? Math.min(n, 10) : 4;
 }
 
-// ─── HTTP / cache ─────────────────────────────────────────────────────────
+// â”€â”€â”€ HTTP / cache â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const responseCache = new Map();
 const inFlight = new Map();
 const MAX_CACHE = 200;
@@ -272,32 +273,32 @@ function backdropUrl(path, size) {
   return IMG + (size || backdropSize()) + path;
 }
 
-// ─── Genres (movie ≠ TV) ──────────────────────────────────────────────────
+// â”€â”€â”€ Genres (movie â‰  TV) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const MOVIE_GENRES = [
-  { id: 28, name: 'Acción' },
+  { id: 28, name: 'AcciÃ³n' },
   { id: 12, name: 'Aventura' },
-  { id: 16, name: 'Animación' },
+  { id: 16, name: 'AnimaciÃ³n' },
   { id: 35, name: 'Comedia' },
   { id: 80, name: 'Crimen' },
   { id: 99, name: 'Documental' },
   { id: 18, name: 'Drama' },
   { id: 10751, name: 'Familia' },
-  { id: 14, name: 'Fantasía' },
+  { id: 14, name: 'FantasÃ­a' },
   { id: 36, name: 'Historia' },
   { id: 27, name: 'Terror' },
-  { id: 10402, name: 'Música' },
+  { id: 10402, name: 'MÃºsica' },
   { id: 9648, name: 'Misterio' },
   { id: 10749, name: 'Romance' },
-  { id: 878, name: 'Ciencia ficción' },
+  { id: 878, name: 'Ciencia ficciÃ³n' },
   { id: 10770, name: 'TV Movie' },
   { id: 53, name: 'Suspense' },
-  { id: 10752, name: 'Bélica' },
+  { id: 10752, name: 'BÃ©lica' },
   { id: 37, name: 'Western' },
 ];
 
 const TV_GENRES = [
-  { id: 10759, name: 'Acción y Aventura' },
-  { id: 16, name: 'Animación' },
+  { id: 10759, name: 'AcciÃ³n y Aventura' },
+  { id: 16, name: 'AnimaciÃ³n' },
   { id: 35, name: 'Comedia' },
   { id: 80, name: 'Crimen' },
   { id: 99, name: 'Documental' },
@@ -315,20 +316,20 @@ const TV_GENRES = [
 ];
 
 const SORT_OPTIONS = [
-  { id: 'popularity.desc', title: 'Popularidad ↓' },
-  { id: 'popularity.asc', title: 'Popularidad ↑' },
-  { id: 'vote_average.desc', title: 'Valoración ↓' },
-  { id: 'vote_average.asc', title: 'Valoración ↑' },
-  { id: 'primary_release_date.desc', title: 'Fecha salida ↓ (movies)' },
-  { id: 'primary_release_date.asc', title: 'Fecha salida ↑ (movies)' },
-  { id: 'first_air_date.desc', title: 'Fecha estreno ↓ (TV)' },
-  { id: 'first_air_date.asc', title: 'Fecha estreno ↑ (TV)' },
-  { id: 'original_title.asc', title: 'Título A–Z (movies)' },
-  { id: 'title.asc', title: 'Título A–Z' },
-  { id: 'revenue.desc', title: 'Recaudación ↓' },
+  { id: 'popularity.desc', title: 'Popularidad â†“' },
+  { id: 'popularity.asc', title: 'Popularidad â†‘' },
+  { id: 'vote_average.desc', title: 'ValoraciÃ³n â†“' },
+  { id: 'vote_average.asc', title: 'ValoraciÃ³n â†‘' },
+  { id: 'primary_release_date.desc', title: 'Fecha salida â†“ (movies)' },
+  { id: 'primary_release_date.asc', title: 'Fecha salida â†‘ (movies)' },
+  { id: 'first_air_date.desc', title: 'Fecha estreno â†“ (TV)' },
+  { id: 'first_air_date.asc', title: 'Fecha estreno â†‘ (TV)' },
+  { id: 'original_title.asc', title: 'TÃ­tulo Aâ€“Z (movies)' },
+  { id: 'title.asc', title: 'TÃ­tulo Aâ€“Z' },
+  { id: 'revenue.desc', title: 'RecaudaciÃ³n â†“' },
 ];
 
-// ─── Map TMDB item ────────────────────────────────────────────────────────
+// â”€â”€â”€ Map TMDB item â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function mapTmdbItem(r, forcedType) {
   const mt =
     forcedType ||
@@ -339,7 +340,7 @@ function mapTmdbItem(r, forcedType) {
         : 'movie');
   const isTv = mt === 'tv' || mt === 'series';
   const type = isTv ? 'series' : 'movie';
-  const title = r.title || r.name || 'Sin título';
+  const title = r.title || r.name || 'Sin tÃ­tulo';
   const year = String(r.release_date || r.first_air_date || '').slice(0, 4);
   const poster = posterUrl(r.poster_path);
   const backdrop = backdropUrl(r.backdrop_path) || poster;
@@ -382,7 +383,7 @@ function parseContentId(id) {
   return { tmdbId: raw, mediaType: 'movie', raw };
 }
 
-// ─── Home ─────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Home â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 async function fetchList(path, params) {
   const data = await tmdbFetch(path, params);
   return (data.results || []).map((r) => mapTmdbItem(r));
@@ -390,7 +391,7 @@ async function fetchList(path, params) {
 
 /**
  * Home: mezcla de filas.
- * - Algunas filas “hero/backdrop” (layout hint horizontal)
+ * - Algunas filas â€œhero/backdropâ€ (layout hint horizontal)
  * - Otras en poster vertical
  */
 async function getHome() {
@@ -450,18 +451,18 @@ async function getHome() {
     pushRow('novedades', 'Novedades', interleaved.length ? interleaved : mix, 'poster');
 
     // Sliders secundarios de contenido
-    pushRow('trending_movie', 'Películas en tendencia', trMovie, 'poster');
+    pushRow('trending_movie', 'PelÃ­culas en tendencia', trMovie, 'poster');
     pushRow('trending_tv', 'Series en tendencia', trTv, 'poster');
-    pushRow('popular_movie', 'Películas populares', popularMovie, 'poster');
+    pushRow('popular_movie', 'PelÃ­culas populares', popularMovie, 'poster');
     pushRow('popular_tv', 'Series populares', popularTv, 'poster');
-    pushRow('top_movie', 'Mejor valoradas · Cine', topMovie, 'poster');
-    pushRow('top_tv', 'Mejor valoradas · Series', topTv, 'poster');
-    pushRow('on_air', 'Series en emisión', onAir, 'poster');
+    pushRow('top_movie', 'Mejor valoradas Â· Cine', topMovie, 'poster');
+    pushRow('top_tv', 'Mejor valoradas Â· Series', topTv, 'poster');
+    pushRow('on_air', 'Series en emisiÃ³n', onAir, 'poster');
     if (nowPlaying && nowPlaying.length) {
       pushRow('now_playing', 'En cines', nowPlaying, 'poster');
     }
 
-    // Algunos géneros como filas secundarias extra
+    // Algunos gÃ©neros como filas secundarias extra
     try {
       const [action, comedy, scifi, dramaTv] = await Promise.all([
         fetchList('/discover/movie', digitalReleaseParams({ with_genres: 28, sort_by: 'popularity.desc', page: 1, region: region() }, false)),
@@ -469,13 +470,13 @@ async function getHome() {
         fetchList('/discover/movie', digitalReleaseParams({ with_genres: 878, sort_by: 'popularity.desc', page: 1, region: region() }, false)),
         fetchList('/discover/tv', digitalReleaseParams({ with_genres: 18, sort_by: 'popularity.desc', page: 1 }, true)),
       ]);
-      pushRow('genre_action', 'Acción', action, 'poster');
+      pushRow('genre_action', 'AcciÃ³n', action, 'poster');
       pushRow('genre_comedy', 'Comedia', comedy, 'poster');
-      pushRow('genre_scifi', 'Ciencia ficción', scifi, 'poster');
+      pushRow('genre_scifi', 'Ciencia ficciÃ³n', scifi, 'poster');
       pushRow('genre_drama_tv', 'Drama en series', dramaTv, 'poster');
     } catch (_) {}
 
-    // Portada de género = primer contenido del discover de ese género
+    // Portada de gÃ©nero = primer contenido del discover de ese gÃ©nero
     async function firstPosterForGenre(isTv, genreId) {
       try {
         const path = isTv ? '/discover/tv' : '/discover/movie';
@@ -495,7 +496,7 @@ async function getHome() {
       }
     }
 
-    // Géneros · Películas (catálogo con imagen del 1.er título)
+    // GÃ©neros Â· PelÃ­culas (catÃ¡logo con imagen del 1.er tÃ­tulo)
     const genreMovieItems = [];
     for (let i = 0; i < MOVIE_GENRES.length; i += 6) {
       const chunk = MOVIE_GENRES.slice(i, i + 6);
@@ -523,15 +524,15 @@ async function getHome() {
     }
     rows.push({
       id: 'catalogs_genres_movie',
-      title: 'Géneros · Películas',
-      name: 'Géneros · Películas',
+      title: 'GÃ©neros Â· PelÃ­culas',
+      name: 'GÃ©neros Â· PelÃ­culas',
       type: 'catalog',
       layout: 'catalog',
       imageStyle: 'backdrop',
       items: genreMovieItems,
     });
 
-    // Géneros · Series
+    // GÃ©neros Â· Series
     const genreTvItems = [];
     for (let i = 0; i < TV_GENRES.length; i += 6) {
       const chunk = TV_GENRES.slice(i, i + 6);
@@ -559,15 +560,15 @@ async function getHome() {
     }
     rows.push({
       id: 'catalogs_genres_tv',
-      title: 'Géneros · Series',
-      name: 'Géneros · Series',
+      title: 'GÃ©neros Â· Series',
+      name: 'GÃ©neros Â· Series',
       type: 'catalog',
       layout: 'catalog',
       imageStyle: 'backdrop',
       items: genreTvItems,
     });
 
-    // Franquicias con portada de la colección
+    // Franquicias con portada de la colecciÃ³n
     const franchiseItems = [];
     const sample = FRANCHISE_COLLECTIONS.slice(0, 24);
     for (let i = 0; i < sample.length; i += 6) {
@@ -614,8 +615,8 @@ async function getHome() {
 }
 
 
-// ─── Catalogs ─────────────────────────────────────────────────────────────
-/** Caché de portadas de colecciones (poster/backdrop TMDB). */
+// â”€â”€â”€ Catalogs â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+/** CachÃ© de portadas de colecciones (poster/backdrop TMDB). */
 const collectionCovers = new Map();
 
 async function loadCollectionCover(collectionId) {
@@ -641,44 +642,44 @@ async function loadCollectionCover(collectionId) {
 }
 
 /**
- * Lista de catálogos.
- * - Básicos + géneros
- * - Colecciones / franquicias con poster de la colección como portada
+ * Lista de catÃ¡logos.
+ * - BÃ¡sicos + gÃ©neros
+ * - Colecciones / franquicias con poster de la colecciÃ³n como portada
  */
 async function getCatalogs() {
   const catalogs = [
-    { id: 'trending_movie', title: 'Películas en tendencia', type: 'movie', group: 'Destacados' },
+    { id: 'trending_movie', title: 'PelÃ­culas en tendencia', type: 'movie', group: 'Destacados' },
     { id: 'trending_tv', title: 'Series en tendencia', type: 'series', group: 'Destacados' },
-    { id: 'popular_movie', title: 'Películas populares', type: 'movie', group: 'Destacados' },
+    { id: 'popular_movie', title: 'PelÃ­culas populares', type: 'movie', group: 'Destacados' },
     { id: 'popular_tv', title: 'Series populares', type: 'series', group: 'Destacados' },
-    { id: 'top_movie', title: 'Películas mejor valoradas', type: 'movie', group: 'Destacados' },
+    { id: 'top_movie', title: 'PelÃ­culas mejor valoradas', type: 'movie', group: 'Destacados' },
     { id: 'top_tv', title: 'Series mejor valoradas', type: 'series', group: 'Destacados' },
     { id: 'now_playing', title: 'En cines', type: 'movie', group: 'Destacados' },
-    { id: 'upcoming', title: 'Próximos estrenos', type: 'movie', group: 'Destacados' },
-    { id: 'on_the_air', title: 'Series en emisión', type: 'series', group: 'Destacados' },
+    { id: 'upcoming', title: 'PrÃ³ximos estrenos', type: 'movie', group: 'Destacados' },
+    { id: 'on_the_air', title: 'Series en emisiÃ³n', type: 'series', group: 'Destacados' },
     { id: 'airing_today', title: 'Series hoy', type: 'series', group: 'Destacados' },
   ];
 
   for (const g of MOVIE_GENRES) {
     catalogs.push({
       id: 'genre_movie_' + g.id,
-      title: g.name + ' · Películas',
+      title: g.name + ' Â· PelÃ­culas',
       type: 'movie',
       genreId: g.id,
-      group: 'Géneros cine',
+      group: 'GÃ©neros cine',
     });
   }
   for (const g of TV_GENRES) {
     catalogs.push({
       id: 'genre_tv_' + g.id,
-      title: g.name + ' · Series',
+      title: g.name + ' Â· Series',
       type: 'series',
       genreId: g.id,
-      group: 'Géneros series',
+      group: 'GÃ©neros series',
     });
   }
 
-  // Franquicias / colecciones — portada = imagen de la colección TMDB
+  // Franquicias / colecciones â€” portada = imagen de la colecciÃ³n TMDB
   // Cargamos covers en paralelo (limitado) para no saturar
   const franchiseEntries = [];
   const batch = 8;
@@ -697,7 +698,7 @@ async function getCatalogs() {
         type: 'movie',
         group: 'Franquicias',
         collectionId: c.id,
-        // Portada del catálogo = arte de la colección / franquicia
+        // Portada del catÃ¡logo = arte de la colecciÃ³n / franquicia
         poster: poster,
         image: poster,
         cover: poster,
@@ -720,7 +721,7 @@ async function getCatalog(catalogId, opts) {
   const cid = String(catalogId || '').trim();
 
   return cached('cat:' + cid + ':' + page + ':' + lang(), 3 * 60e3, async () => {
-    // ── Colección / franquicia ──
+    // â”€â”€ ColecciÃ³n / franquicia â”€â”€
     const colMatch = cid.match(/^collection[_:](\d+)$/i);
     if (colMatch) {
       const collectionId = colMatch[1];
@@ -749,8 +750,8 @@ async function getCatalog(catalogId, opts) {
         totalPages,
         hasMore: page < totalPages,
         catalogId: cid,
-        title: data.name || 'Colección',
-        // Portada del catálogo = imagen de la franquicia
+        title: data.name || 'ColecciÃ³n',
+        // Portada del catÃ¡logo = imagen de la franquicia
         poster: coverPoster,
         cover: coverPoster,
         backdrop: coverBackdrop,
@@ -828,17 +829,17 @@ async function getCatalog(catalogId, opts) {
   });
 }
 
-// ─── Discover + filters ───────────────────────────────────────────────────
+// â”€â”€â”€ Discover + filters â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 /**
  * Filtros para la UI (selects):
  *  1) type: movie | tv
  *  2) genre: depende del tipo
- *  3) sort: fecha, valoración, letras, popularidad…
+ *  3) sort: fecha, valoraciÃ³n, letras, popularidadâ€¦
  */
 async function getDiscoverFilters() {
   // La app solo muestra hasta 3 filtros, cada uno con { id, label, options:[{id,label}] }
   const typeOpts = [
-    { id: 'movie', label: 'Películas' },
+    { id: 'movie', label: 'PelÃ­culas' },
     { id: 'tv', label: 'Series' },
   ];
 
@@ -848,26 +849,26 @@ async function getDiscoverFilters() {
   const genreTv = TV_GENRES.map(function (g) {
     return { id: 't' + g.id, label: g.name };
   });
-  // Un solo select de género con prefijo m/t para distinguir
+  // Un solo select de gÃ©nero con prefijo m/t para distinguir
   const genreOpts = [{ id: 'all', label: 'Todos' }]
-    .concat(genreMovie.map(function (g) { return { id: g.id, label: '🎬 ' + g.label }; }))
-    .concat(genreTv.map(function (g) { return { id: g.id, label: '📺 ' + g.label }; }));
+    .concat(genreMovie.map(function (g) { return { id: g.id, label: 'ðŸŽ¬ ' + g.label }; }))
+    .concat(genreTv.map(function (g) { return { id: g.id, label: 'ðŸ“º ' + g.label }; }));
 
   const sortOpts = [
-    { id: 'popularity.desc', label: 'Popularidad ↓' },
-    { id: 'popularity.asc', label: 'Popularidad ↑' },
-    { id: 'vote_average.desc', label: 'Valoración ↓' },
-    { id: 'vote_average.asc', label: 'Valoración ↑' },
-    { id: 'date.desc', label: 'Fecha ↓' },
-    { id: 'date.asc', label: 'Fecha ↑' },
-    { id: 'title.asc', label: 'Título A–Z' },
-    { id: 'title.desc', label: 'Título Z–A' },
-    { id: 'revenue.desc', label: 'Recaudación ↓' },
+    { id: 'popularity.desc', label: 'Popularidad â†“' },
+    { id: 'popularity.asc', label: 'Popularidad â†‘' },
+    { id: 'vote_average.desc', label: 'ValoraciÃ³n â†“' },
+    { id: 'vote_average.asc', label: 'ValoraciÃ³n â†‘' },
+    { id: 'date.desc', label: 'Fecha â†“' },
+    { id: 'date.asc', label: 'Fecha â†‘' },
+    { id: 'title.asc', label: 'TÃ­tulo Aâ€“Z' },
+    { id: 'title.desc', label: 'TÃ­tulo Zâ€“A' },
+    { id: 'revenue.desc', label: 'RecaudaciÃ³n â†“' },
   ];
 
   return [
     { id: 'type', label: 'Tipo', options: typeOpts },
-    { id: 'genre', label: 'Género', options: genreOpts },
+    { id: 'genre', label: 'GÃ©nero', options: genreOpts },
     { id: 'sort', label: 'Ordenar', options: sortOpts },
   ];
 }
@@ -877,7 +878,7 @@ async function getDiscover(opts) {
   opts = opts || {};
   const page = parseInt(opts.page || 1, 10) || 1;
 
-  // App envía { page, type, genre, sort } según ids de getDiscoverFilters
+  // App envÃ­a { page, type, genre, sort } segÃºn ids de getDiscoverFilters
   let type = String(opts.type || opts.kind || opts.media || 'movie').toLowerCase();
   let genre = String(opts.genre || opts.genreId || opts.with_genres || '').trim();
   let sort = String(opts.sort || opts.sort_by || opts.order || 'popularity.desc').trim();
@@ -887,7 +888,7 @@ async function getDiscover(opts) {
   if (type === 'series' || type === 'show') type = 'tv';
   if (type !== 'tv') type = 'movie';
 
-  // Género con prefijo m28 / t18
+  // GÃ©nero con prefijo m28 / t18
   if (/^m\d+$/i.test(genre)) {
     type = 'movie';
     genre = genre.slice(1);
@@ -898,7 +899,7 @@ async function getDiscover(opts) {
     genre = '';
   }
 
-  // Orden genérico date/title → campo TMDB
+  // Orden genÃ©rico date/title â†’ campo TMDB
   if (sort === 'date.desc') sort = type === 'tv' ? 'first_air_date.desc' : 'primary_release_date.desc';
   if (sort === 'date.asc') sort = type === 'tv' ? 'first_air_date.asc' : 'primary_release_date.asc';
   if (sort === 'title.asc') sort = type === 'tv' ? 'name.asc' : 'original_title.asc';
@@ -942,8 +943,8 @@ async function getDiscover(opts) {
 }
 
 
-// ─── Meta (logo, seasons, all episodes, IMDb) ─────────────────────────────
-const imdbByTmdb = new Map(); // "movie:123" | "tv:123" → tt…
+// â”€â”€â”€ Meta (logo, seasons, all episodes, IMDb) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+const imdbByTmdb = new Map(); // "movie:123" | "tv:123" â†’ ttâ€¦
 
 async function pickLogo(images) {
   const logos = (images && images.logos) || [];
@@ -979,7 +980,7 @@ async function getMeta(id, options) {
     mediaType = 'movie';
   }
 
-  // IMDb → TMDB
+  // IMDb â†’ TMDB
   if (isImdb || /^tt\d+/i.test(String(tmdbId))) {
     const find = await tmdbFetch('/find/' + tmdbId, {
       external_source: 'imdb_id',
@@ -1017,7 +1018,7 @@ async function getMeta(id, options) {
       }
 
       const isTv = mediaType === 'tv';
-      const title = data.title || data.name || 'Sin título';
+      const title = data.title || data.name || 'Sin tÃ­tulo';
       const year = String(data.release_date || data.first_air_date || '').slice(0, 4);
       const genres = (data.genres || []).map((g) => g.name);
       const imdb = (data.external_ids && data.external_ids.imdb_id) || null;
@@ -1110,7 +1111,7 @@ async function getMeta(id, options) {
         seasons.sort((a, b) => a.number - b.number);
       }
 
-      // Intro/outro a nivel meta (película) — el player también los pide en streams
+      // Intro/outro a nivel meta (pelÃ­cula) â€” el player tambiÃ©n los pide en streams
       let segments = null;
       if (imdb) {
         try {
@@ -1161,7 +1162,7 @@ async function getMeta(id, options) {
   );
 }
 
-// ─── IntroDB ──────────────────────────────────────────────────────────────
+// â”€â”€â”€ IntroDB â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const introdbCache = new Map();
 
 function rangeFromSegment(seg) {
@@ -1230,7 +1231,156 @@ async function resolveImdbFor(tmdbId, mediaType) {
   return '';
 }
 
-// ─── Search ───────────────────────────────────────────────────────────────
+// â”€â”€â”€ OpenSubtitles (Stremio v3) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+const opensubsCache = new Map();
+
+function mapSubLang(code) {
+  const c = String(code || '').toLowerCase();
+  if (c === 'spa' || c === 'es' || c === 'esp' || c === 'es-es' || c === 'es-mx' || c === 'spl') return 'es';
+  if (c === 'eng' || c === 'en' || c === 'en-us' || c === 'en-gb') return 'en';
+  if (c === 'por' || c === 'pob' || c === 'pt' || c === 'pt-br' || c === 'pb') return 'pt';
+  if (c === 'fre' || c === 'fra' || c === 'fr') return 'fr';
+  if (c === 'ger' || c === 'deu' || c === 'de') return 'de';
+  if (c === 'ita' || c === 'it') return 'it';
+  if (c === 'jpn' || c === 'ja') return 'ja';
+  if (c === 'chi' || c === 'zho' || c === 'zh' || c === 'zh-cn' || c === 'zh-tw') return 'zh';
+  return c || 'und';
+}
+
+function subLangPriority(langCode) {
+  // Prefer Spanish (app default), then English, then others
+  const l = mapSubLang(langCode);
+  const appLang = (typeof lang === 'function' ? lang() : 'es-MX').toLowerCase();
+  if (appLang.startsWith('es')) {
+    if (l === 'es') return 0;
+    if (l === 'en') return 1;
+    return 2;
+  }
+  if (appLang.startsWith('en')) {
+    if (l === 'en') return 0;
+    if (l === 'es') return 1;
+    return 2;
+  }
+  if (l === 'en') return 0;
+  if (l === 'es') return 1;
+  return 2;
+}
+
+/**
+ * OpenSubtitles v3 (Stremio):
+ *   movie:  /subtitles/movie/{imdb}.json
+ *   series: /subtitles/series/{imdb}:{season}:{episode}.json
+ *           /subtitles/series/{imdb}.json
+ * Returns array compatible with ExternalSubtitle of the app:
+ *   { lang, label, url, format }
+ */
+async function fetchOpenSubtitles(imdbId, mediaType, season, episode) {
+  const id = String(imdbId || '').trim();
+  if (!/^tt\d{7,}$/i.test(id)) return [];
+  const isTv = mediaType === 'tv' || mediaType === 'series';
+  const s = Number(season || 1) || 1;
+  const e = Number(episode || 1) || 1;
+  const ck = isTv ? id.toLowerCase() + ':s' + s + 'e' + e : id.toLowerCase() + ':movie';
+  if (opensubsCache.has(ck)) return opensubsCache.get(ck) || [];
+
+  let path;
+  if (isTv) {
+    path = '/series/' + id + ':' + s + ':' + e + '.json';
+  } else {
+    path = '/movie/' + id + '.json';
+  }
+  const url = OPENSUBTITLES + path;
+
+  try {
+    const opts = { method: 'GET', headers: { Accept: 'application/json' } };
+    if (typeof AbortSignal !== 'undefined' && typeof AbortSignal.timeout === 'function') {
+      opts.signal = AbortSignal.timeout(8000);
+    }
+    const res = await fetch(url, opts);
+    if (!res.ok) {
+      // Fallback series without episode
+      if (isTv) {
+        const res2 = await fetch(OPENSUBTITLES + '/series/' + id + '.json', opts).catch(function () { return null; });
+        if (!res2 || !res2.ok) {
+          opensubsCache.set(ck, []);
+          return [];
+        }
+        const json2 = await res2.json();
+        const list2 = normalizeOpenSubs(json2, s, e);
+        opensubsCache.set(ck, list2);
+        limitMap(opensubsCache, 200);
+        return list2;
+      }
+      opensubsCache.set(ck, []);
+      return [];
+    }
+    const json = await res.json();
+    const list = normalizeOpenSubs(json, isTv ? s : 0, isTv ? e : 0);
+    opensubsCache.set(ck, list);
+    limitMap(opensubsCache, 200);
+    return list;
+  } catch (err) {
+    console.log('[OpenSubs] error: ' + (err && err.message ? err.message : err));
+    opensubsCache.set(ck, []);
+    return [];
+  }
+}
+
+function normalizeOpenSubs(json, season, episode) {
+  const raw = (json && json.subtitles) || [];
+  if (!Array.isArray(raw) || !raw.length) return [];
+
+  const out = [];
+  const seenUrl = new Set();
+
+  for (let i = 0; i < raw.length; i++) {
+    const s = raw[i];
+    if (!s || !s.url) continue;
+    const url = String(s.url).trim();
+    if (!url || seenUrl.has(url)) continue;
+    // If episode filter returned extras without matching s/e, skip when we know them
+    if (season > 0 && s.season != null && Number(s.season) !== Number(season)) continue;
+    if (episode > 0 && s.episode != null && Number(s.episode) !== Number(episode)) continue;
+
+    seenUrl.add(url);
+    const lang = mapSubLang(s.lang || s.language || 'und');
+    const fileName = s.subtitleFileName || s.fileName || '';
+    const release = s.movieReleaseName || s.releaseGroup || '';
+    let label = lang.toUpperCase();
+    if (fileName) {
+      label = lang.toUpperCase() + ' Â· ' + String(fileName).replace(/\.srt$/i, '').slice(0, 48);
+    } else if (release) {
+      label = lang.toUpperCase() + ' Â· ' + String(release).slice(0, 40);
+    }
+    let format = 'srt';
+    const lower = url.toLowerCase() + ' ' + String(fileName).toLowerCase();
+    if (lower.includes('.vtt')) format = 'vtt';
+    else if (lower.includes('.ass') || lower.includes('.ssa')) format = 'ass';
+    else if (lower.includes('.srt')) format = 'srt';
+
+    out.push({
+      lang: lang,
+      label: label,
+      url: url,
+      format: format,
+      // extras opcionales (el player ignora lo que no conoce)
+      id: s.id != null ? String(s.id) : undefined,
+      SubEncoding: s.SubEncoding || undefined,
+    });
+  }
+
+  // Orden: idioma preferido â†’ resto; limitar para no saturar el menÃº del player
+  out.sort(function (a, b) {
+    const pa = subLangPriority(a.lang);
+    const pb = subLangPriority(b.lang);
+    if (pa !== pb) return pa - pb;
+    return 0;
+  });
+  return out.slice(0, 25);
+}
+
+
+// â”€â”€â”€ Search â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 async function search(query) {
   if (!query || !String(query).trim()) return { items: [] };
   return cached('search:' + query + ':' + lang(), 30e3, async () => {
@@ -1246,11 +1396,11 @@ async function search(query) {
   });
 }
 
-// ─── Extractors / Streams ─────────────────────────────────────────────────
+// â”€â”€â”€ Extractors / Streams â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 /**
- * Extractores: se cargan desde __EXTRACTOR_SOURCES (código embebido) si existe,
+ * Extractores: se cargan desde __EXTRACTOR_SOURCES (cÃ³digo embebido) si existe,
  * o desde globalThis[name], o se dejan stubs documentados.
- * Firma: getStreams(tmdbId, mediaType, season, episode) → streams[]
+ * Firma: getStreams(tmdbId, mediaType, season, episode) â†’ streams[]
  *
  * Fuentes por defecto:
  *   embed69, vimeus, lamovie, elifilms, homecine,
@@ -1262,7 +1412,7 @@ function loadExtractor(name) {
   if (__loadedExtractors[name] !== undefined) return __loadedExtractors[name];
   const n = String(name).toLowerCase();
 
-  // 1) Código embebido (mismo patrón que el repo de catálogos)
+  // 1) CÃ³digo embebido (mismo patrÃ³n que el repo de catÃ¡logos)
   try {
     const code =
       typeof __EXTRACTOR_SOURCES !== 'undefined' && __EXTRACTOR_SOURCES
@@ -1364,21 +1514,21 @@ async function getStreams(id, type, season, episode) {
 
   tmdbId = String(tmdbId).replace(/^(movie|tv|series)[:/]/i, '');
 
-  // IMDb + IntroDB siempre (para el player, independientemente del extractor)
+  // IMDb + IntroDB + OpenSubtitles (player: segmentos + subtÃ­tulos externos)
   let streamSegments = null;
+  let streamSubtitles = [];
   try {
     const imdb = await resolveImdbFor(tmdbId, mediaType);
     if (imdb) {
-      if (mediaType === 'tv') {
-        streamSegments = await fetchIntroDbSegments(
-          imdb,
-          season || 1,
-          episode || 1,
-          false
-        );
-      } else {
-        streamSegments = await fetchIntroDbSegments(imdb, 0, 0, true);
-      }
+      const isTv = mediaType === 'tv' || mediaType === 'series';
+      const [segs, subs] = await Promise.all([
+        isTv
+          ? fetchIntroDbSegments(imdb, season || 1, episode || 1, false)
+          : fetchIntroDbSegments(imdb, 0, 0, true),
+        fetchOpenSubtitles(imdb, mediaType, season || 1, episode || 1),
+      ]);
+      streamSegments = segs;
+      streamSubtitles = Array.isArray(subs) ? subs : [];
     }
   } catch (_) {}
 
@@ -1417,6 +1567,26 @@ async function getStreams(id, type, season, episode) {
             ns.skip = streamSegments;
             ns.markers = streamSegments;
           }
+          // SubtÃ­tulos OpenSubtitles (si el extractor no trajo los suyos)
+          if (streamSubtitles && streamSubtitles.length) {
+            if (!ns.subtitles || !ns.subtitles.length) {
+              ns.subtitles = streamSubtitles;
+              ns.subs = streamSubtitles;
+            } else {
+              // Combinar sin duplicar URL
+              const have = new Set(
+                (ns.subtitles || []).map(function (x) { return String(x && x.url || ''); })
+              );
+              for (let si = 0; si < streamSubtitles.length; si++) {
+                const su = streamSubtitles[si];
+                if (su && su.url && !have.has(su.url)) {
+                  ns.subtitles.push(su);
+                  have.add(su.url);
+                }
+              }
+              ns.subs = ns.subtitles;
+            }
+          }
           allStreams.push(ns);
         }
       } catch (e) {
@@ -1438,17 +1608,19 @@ async function getStreams(id, type, season, episode) {
   });
 
   // Si no hubo extractores, devolver placeholder con segmentos para depurar player
-  if (!allStreams.length && streamSegments) {
+  if (!allStreams.length && (streamSegments || (streamSubtitles && streamSubtitles.length))) {
     return [
       {
-        name: 'IntroDB only',
-        title: 'Sin servidores — segmentos intro/outro disponibles',
+        name: 'IntroDB / Subs only',
+        title: 'Sin servidores â€” segmentos/subtÃ­tulos disponibles',
         url: 'https://example.invalid/no-stream',
         quality: 'N/A',
-        language: '—',
-        segments: streamSegments,
-        skip: streamSegments,
-        markers: streamSegments,
+        language: 'â€”',
+        segments: streamSegments || undefined,
+        skip: streamSegments || undefined,
+        markers: streamSegments || undefined,
+        subtitles: streamSubtitles && streamSubtitles.length ? streamSubtitles : undefined,
+        subs: streamSubtitles && streamSubtitles.length ? streamSubtitles : undefined,
       },
     ];
   }
@@ -1456,7 +1628,7 @@ async function getStreams(id, type, season, episode) {
   return allStreams;
 }
 
-// ─── Config schema (para la UI de la app) ─────────────────────────────────
+// â”€â”€â”€ Config schema (para la UI de la app) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function getConfigSchema() {
   return {
     id: ADDON_ID,
@@ -1467,15 +1639,15 @@ function getConfigSchema() {
         type: 'string',
         label: 'API Key TMDB',
         default: '',
-        placeholder: 'Dejar vacío para usar la del addon',
+        placeholder: 'Dejar vacÃ­o para usar la del addon',
       },
       {
         key: 'tmdb_lang',
         type: 'select',
         label: 'Idioma',
         options: [
-          { value: 'es-MX', label: 'Español (México)' },
-          { value: 'es-ES', label: 'Español (España)' },
+          { value: 'es-MX', label: 'EspaÃ±ol (MÃ©xico)' },
+          { value: 'es-ES', label: 'EspaÃ±ol (EspaÃ±a)' },
           { value: 'en-US', label: 'English' },
         ],
         default: 'es-ES',
@@ -1507,7 +1679,7 @@ function getConfigSchema() {
       {
         key: 'region',
         type: 'string',
-        label: 'Región (ES, MX, US…)',
+        label: 'RegiÃ³n (ES, MX, USâ€¦)',
         default: 'ES',
       },
       {
@@ -1519,7 +1691,7 @@ function getConfigSchema() {
       {
         key: 'include_theater',
         type: 'boolean',
-        label: 'Incluir fila “En cines” en Home',
+        label: 'Incluir fila â€œEn cinesâ€ en Home',
         default: false,
       },
       {
@@ -1531,7 +1703,7 @@ function getConfigSchema() {
       {
         key: 'hide_unreleased_eps',
         type: 'boolean',
-        label: 'Ocultar capítulos no estrenados',
+        label: 'Ocultar capÃ­tulos no estrenados',
         default: true,
       },
       {
@@ -1550,7 +1722,7 @@ function getConfigSchema() {
   };
 }
 
-// ─── API pública ──────────────────────────────────────────────────────────
+// â”€â”€â”€ API pÃºblica â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const addon = {
   id: ADDON_ID,
   getHome,
