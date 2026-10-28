@@ -1336,6 +1336,9 @@ function normalizeOpenSubs(json, season, episode) {
   for (let i = 0; i < raw.length; i++) {
     const s = raw[i];
     if (!s || !s.url) continue;
+    // Solo subtÃ­tulos en espaÃ±ol (lang === "spa") de la API OpenSubtitles
+    const rawLang = String(s.lang || s.language || '').toLowerCase();
+    if (rawLang !== 'spa') continue;
     const url = String(s.url).trim();
     if (!url || seenUrl.has(url)) continue;
     // If episode filter returned extras without matching s/e, skip when we know them
@@ -1343,14 +1346,14 @@ function normalizeOpenSubs(json, season, episode) {
     if (episode > 0 && s.episode != null && Number(s.episode) !== Number(episode)) continue;
 
     seenUrl.add(url);
-    const lang = mapSubLang(s.lang || s.language || 'und');
+    const lang = 'spa';
     const fileName = s.subtitleFileName || s.fileName || '';
     const release = s.movieReleaseName || s.releaseGroup || '';
-    let label = lang.toUpperCase();
+    let label = 'SPA';
     if (fileName) {
-      label = lang.toUpperCase() + ' Â· ' + String(fileName).replace(/\.srt$/i, '').slice(0, 48);
+      label = 'SPA Â· ' + String(fileName).replace(/\.srt$/i, '').slice(0, 48);
     } else if (release) {
-      label = lang.toUpperCase() + ' Â· ' + String(release).slice(0, 40);
+      label = 'SPA Â· ' + String(release).slice(0, 40);
     }
     let format = 'srt';
     const lower = url.toLowerCase() + ' ' + String(fileName).toLowerCase();
@@ -1363,7 +1366,6 @@ function normalizeOpenSubs(json, season, episode) {
       label: label,
       url: url,
       format: format,
-      // extras opcionales (el player ignora lo que no conoce)
       id: s.id != null ? String(s.id) : undefined,
       SubEncoding: s.SubEncoding || undefined,
     });
