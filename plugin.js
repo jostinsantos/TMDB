@@ -103,7 +103,7 @@ const FAMOUS_ACTORS = [
 /** Franquicias / colecciones TMDB (id + nombre). La portada se obtiene de /collection/{id}. */
 const FRANCHISE_COLLECTIONS = [
   { id: 10, name: 'Star Wars' },
-  { id: 119, name: 'El SeÃ±or de los Anillos' },
+  { id: 119, name: 'El Senor de los Anillos' },
   { id: 1241, name: 'Harry Potter' },
   { id: 295, name: 'Piratas del Caribe' },
   { id: 328, name: 'Jurassic Park' },
@@ -217,7 +217,7 @@ function region() {
 }
 
 function truthy(v) {
-  return /^(1|true|yes|on|si|sÃ­)$/i.test(String(v == null ? '' : v).trim());
+  return /^(1|true|yes|on|si|si)$/i.test(String(v == null ? '' : v).trim());
 }
 
 function includeTheater() {
@@ -384,30 +384,30 @@ function backdropUrl(path, size) {
 
 // â”€â”€â”€ Genres (movie Ã¢â€°  TV) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const MOVIE_GENRES = [
-  { id: 28, name: 'AcciÃ³n' },
+  { id: 28, name: 'Accion' },
   { id: 12, name: 'Aventura' },
-  { id: 16, name: 'AnimaciÃ³n' },
+  { id: 16, name: 'Animacion' },
   { id: 35, name: 'Comedia' },
   { id: 80, name: 'Crimen' },
   { id: 99, name: 'Documental' },
   { id: 18, name: 'Drama' },
   { id: 10751, name: 'Familia' },
-  { id: 14, name: 'FantasÃ­a' },
+  { id: 14, name: 'Fantasia' },
   { id: 36, name: 'Historia' },
   { id: 27, name: 'Terror' },
-  { id: 10402, name: 'MÃºsica' },
+  { id: 10402, name: 'Musica' },
   { id: 9648, name: 'Misterio' },
   { id: 10749, name: 'Romance' },
-  { id: 878, name: 'Ciencia ficciÃ³n' },
+  { id: 878, name: 'Ciencia ficcion' },
   { id: 10770, name: 'TV Movie' },
   { id: 53, name: 'Suspense' },
-  { id: 10752, name: 'BÃ©lica' },
+  { id: 10752, name: 'Belica' },
   { id: 37, name: 'Western' },
 ];
 
 const TV_GENRES = [
-  { id: 10759, name: 'AcciÃ³n y Aventura' },
-  { id: 16, name: 'AnimaciÃ³n' },
+  { id: 10759, name: 'Accion y Aventura' },
+  { id: 16, name: 'Animacion' },
   { id: 35, name: 'Comedia' },
   { id: 80, name: 'Crimen' },
   { id: 99, name: 'Documental' },
@@ -425,17 +425,17 @@ const TV_GENRES = [
 ];
 
 const SORT_OPTIONS = [
-  { id: 'popularity.desc', title: 'Popularidad â†“' },
-  { id: 'popularity.asc', title: 'Popularidad â†‘' },
-  { id: 'vote_average.desc', title: 'ValoraciÃ³n â†“' },
-  { id: 'vote_average.asc', title: 'ValoraciÃ³n â†‘' },
-  { id: 'primary_release_date.desc', title: 'Fecha salida â†“ (movies)' },
-  { id: 'primary_release_date.asc', title: 'Fecha salida â†‘ (movies)' },
-  { id: 'first_air_date.desc', title: 'Fecha estreno â†“ (TV)' },
-  { id: 'first_air_date.asc', title: 'Fecha estreno â†‘ (TV)' },
-  { id: 'original_title.asc', title: 'TÃ­tulo Aâ€“Z (movies)' },
-  { id: 'title.asc', title: 'TÃ­tulo Aâ€“Z' },
-  { id: 'revenue.desc', title: 'RecaudaciÃ³n â†“' },
+  { id: 'popularity.desc', title: 'Popularidad -' },
+  { id: 'popularity.asc', title: 'Popularidad +' },
+  { id: 'vote_average.desc', title: 'Valoracion -' },
+  { id: 'vote_average.asc', title: 'Valoracion +' },
+  { id: 'primary_release_date.desc', title: 'Fecha salida - (movies)' },
+  { id: 'primary_release_date.asc', title: 'Fecha salida + (movies)' },
+  { id: 'first_air_date.desc', title: 'Fecha estreno - (TV)' },
+  { id: 'first_air_date.asc', title: 'Fecha estreno + (TV)' },
+  { id: 'original_title.asc', title: 'Titulo A-Z (movies)' },
+  { id: 'title.asc', title: 'Titulo A-Z' },
+  { id: 'revenue.desc', title: 'Recaudacion -' },
 ];
 
 // â”€â”€â”€ Map TMDB item â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -449,11 +449,12 @@ function mapTmdbItem(r, forcedType) {
         : 'movie');
   const isTv = mt === 'tv' || mt === 'series';
   const type = isTv ? 'series' : 'movie';
-  const title = r.title || r.name || 'Sin tÃ­tulo';
+  const title = r.title || r.name || 'Sin titulo';
   const year = String(r.release_date || r.first_air_date || '').slice(0, 4);
   const poster = posterUrl(r.poster_path);
   const backdrop = backdropUrl(r.backdrop_path) || poster;
   const id = (isTv ? 'tv:' : 'movie:') + String(r.id);
+  const originalLanguage = String(r.original_language || r.originalLanguage || '').toLowerCase();
 
   return {
     id,
@@ -475,6 +476,8 @@ function mapTmdbItem(r, forcedType) {
     genres: Array.isArray(r.genre_ids) ? r.genre_ids : [],
     adult: !!r.adult,
     popularity: r.popularity,
+    original_language: originalLanguage,
+    originalLanguage: originalLanguage,
   };
 }
 
@@ -493,10 +496,71 @@ function parseContentId(id) {
 }
 
 // â”€â”€â”€ Home â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+/** Idiomas permitidos en home/catalogos (no asia/india/rusia/etc.) */
+const ALLOWED_LANGS = {
+  es: 1, en: 1, pt: 1, fr: 1, it: 1, de: 1, ca: 1, gl: 1, eu: 1, nl: 1, sv: 1, no: 1, da: 1, fi: 1, pl: 1,
+};
+
+function isAllowedLanguage(lang) {
+  const l = String(lang || '').toLowerCase().slice(0, 2);
+  if (!l) return true; // sin dato: no descartar
+  return !!ALLOWED_LANGS[l];
+}
+
+function hasPoster(item) {
+  if (!item) return false;
+  const p = item.poster || item.image || item.poster_path;
+  return !!(p && String(p).trim() && String(p) !== 'null');
+}
+
+/** Filtra items sin poster y de idiomas no deseados (asiatico, indio, ruso, etc.) */
+function filterDisplayItems(list) {
+  if (!Array.isArray(list)) return [];
+  const out = [];
+  const seen = {};
+  for (let i = 0; i < list.length; i++) {
+    const it = list[i];
+    if (!it || !it.id) continue;
+    if (!hasPoster(it)) continue;
+    if (!isAllowedLanguage(it.original_language || it.originalLanguage)) continue;
+    if (seen[it.id]) continue;
+    seen[it.id] = true;
+    out.push(it);
+  }
+  return out;
+}
+
 async function fetchList(path, params) {
   const data = await tmdbFetch(path, params);
-  return (data.results || []).map((r) => mapTmdbItem(r));
+  const mapped = (data.results || []).map(function (r) { return mapTmdbItem(r); });
+  return filterDisplayItems(mapped);
 }
+
+/** Varias paginas hasta reunir N items validos (poster + idioma) */
+async function fetchListFilled(path, baseParams, want) {
+  want = want || 18;
+  const acc = [];
+  const seen = {};
+  for (let page = 1; page <= 4 && acc.length < want; page++) {
+    const params = Object.assign({}, baseParams || {}, { page: page });
+    let batch = [];
+    try {
+      batch = await fetchList(path, params);
+    } catch (_) {
+      break;
+    }
+    for (let i = 0; i < batch.length; i++) {
+      const it = batch[i];
+      if (!it || seen[it.id]) continue;
+      seen[it.id] = true;
+      acc.push(it);
+      if (acc.length >= want) break;
+    }
+    if (!batch.length) break;
+  }
+  return acc;
+}
+
 
 /**
  * Home: mezcla de filas.
@@ -504,10 +568,11 @@ async function fetchList(path, params) {
  * - Otras en poster vertical
  */
 async function getHome() {
-  return cached('home:' + lang() + ':' + region() + ':' + (excludeInTheater() ? '1' : '0'), 5 * 60e3, async () => {
+  return cached('home:' + lang() + ':' + region() + ':' + (excludeInTheater() ? '1' : '0') + ':v2', 5 * 60e3, async () => {
     const rows = [];
     const pushRow = function (id, title, items, layout) {
-      if (!items || !items.length) return;
+      const clean = filterDisplayItems(items || []);
+      if (!clean.length) return;
       rows.push({
         id: id,
         title: title,
@@ -515,75 +580,88 @@ async function getHome() {
         type: 'row',
         layout: layout || 'poster',
         imageStyle: layout === 'backdrop' ? 'backdrop' : 'poster',
-        items: items.slice(0, 18),
+        items: clean.slice(0, 18),
       });
     };
 
-    // Ventana "reciÃ©n llegados al catÃ¡logo / VOD digital" (~60 dÃ­as)
     const today = new Date();
     const pad = function (n) { return n < 10 ? '0' + n : String(n); };
     const iso = function (d) {
       return d.getUTCFullYear() + '-' + pad(d.getUTCMonth() + 1) + '-' + pad(d.getUTCDate());
     };
     const todayStr = iso(today);
-    const from = new Date(today.getTime() - 60 * 24 * 60 * 60 * 1000);
-    const fromStr = iso(from);
+    const from90 = iso(new Date(today.getTime() - 90 * 24 * 60 * 60 * 1000));
+    const from60 = iso(new Date(today.getTime() - 60 * 24 * 60 * 60 * 1000));
 
-    // PelÃ­culas con release digital/fÃ­sico/TV reciente (tipos 4|5|6)
+    // Reciente digital (VOD) + series nuevas + tendencias (relleno)
     const recentDigitalMovieParams = {
-      page: 1,
       region: region(),
       sort_by: 'primary_release_date.desc',
-      'primary_release_date.gte': fromStr,
+      'primary_release_date.gte': from90,
       'primary_release_date.lte': todayStr,
       with_release_type: '4|5|6',
       include_adult: false,
+      'vote_count.gte': 20,
     };
-    // Series estrenadas / aÃ±adidas al catÃ¡logo en la misma ventana
     const recentSeriesParams = {
-      page: 1,
       sort_by: 'first_air_date.desc',
-      'first_air_date.gte': fromStr,
+      'first_air_date.gte': from90,
       'first_air_date.lte': todayStr,
       include_adult: false,
+      'vote_count.gte': 15,
     };
 
-    // Listas en paralelo
     const [
       trAll, trMovie, trTv, popularMovie, popularTv, topMovie, topTv, onAir, nowPlaying,
       recentDigitalMovies, recentSeriesCatalog
     ] = await Promise.all([
-      fetchList('/trending/all/week', { page: 1 }).catch(function () { return []; }),
-      fetchList('/trending/movie/week', { page: 1 }).catch(function () { return []; }),
-      fetchList('/trending/tv/week', { page: 1 }).catch(function () { return []; }),
-      fetchList('/movie/popular', digitalReleaseParams({ page: 1, region: region() }, false)).catch(function () { return []; }),
-      fetchList('/tv/popular', digitalReleaseParams({ page: 1 }, true)).catch(function () { return []; }),
-      fetchList('/movie/top_rated', digitalReleaseParams({ page: 1 }, false)).catch(function () { return []; }),
-      fetchList('/tv/top_rated', digitalReleaseParams({ page: 1 }, true)).catch(function () { return []; }),
-      fetchList('/tv/on_the_air', digitalReleaseParams({ page: 1 }, true)).catch(function () { return []; }),
+      fetchListFilled('/trending/all/week', {}, 24).catch(function () { return []; }),
+      fetchListFilled('/trending/movie/week', {}, 24).catch(function () { return []; }),
+      fetchListFilled('/trending/tv/week', {}, 24).catch(function () { return []; }),
+      fetchListFilled('/movie/popular', digitalReleaseParams({ region: region() }, false), 20).catch(function () { return []; }),
+      fetchListFilled('/tv/popular', digitalReleaseParams({}, true), 20).catch(function () { return []; }),
+      fetchListFilled('/movie/top_rated', digitalReleaseParams({}, false), 18).catch(function () { return []; }),
+      fetchListFilled('/tv/top_rated', digitalReleaseParams({}, true), 18).catch(function () { return []; }),
+      fetchListFilled('/tv/on_the_air', digitalReleaseParams({}, true), 18).catch(function () { return []; }),
       excludeInTheater()
         ? Promise.resolve([])
-        : fetchList('/movie/now_playing', { page: 1, region: region() }).catch(function () { return []; }),
-      fetchList('/discover/movie', recentDigitalMovieParams).catch(function () { return []; }),
-      fetchList('/discover/tv', recentSeriesParams).catch(function () { return []; }),
+        : fetchListFilled('/movie/now_playing', { region: region() }, 18).catch(function () { return []; }),
+      fetchListFilled('/discover/movie', recentDigitalMovieParams, 24).catch(function () { return []; }),
+      fetchListFilled('/discover/tv', recentSeriesParams, 24).catch(function () { return []; }),
     ]);
 
-    // â€”â€”â€” Novedades: lo que acaba de entrar al catÃ¡logo (VOD digital + series recientes) â€”â€”â€”
+    // Fallback digital: si release_type vacio, usar estrenos recientes por fecha
+    let digitalMovies = recentDigitalMovies;
+    if (!digitalMovies.length) {
+      digitalMovies = await fetchListFilled('/discover/movie', {
+        region: region(),
+        sort_by: 'primary_release_date.desc',
+        'primary_release_date.gte': from60,
+        'primary_release_date.lte': todayStr,
+        include_adult: false,
+        'vote_count.gte': 30,
+      }, 24).catch(function () { return []; });
+    }
+
+    // --- Novedades (SIEMPRE primera fila) ---
     const seen = {};
     const mix = [];
     function addMix(list) {
       (list || []).forEach(function (it) {
         if (!it || !it.id || seen[it.id]) return;
+        if (!hasPoster(it)) return;
+        if (!isAllowedLanguage(it.original_language || it.originalLanguage)) return;
         seen[it.id] = true;
         mix.push(it);
       });
     }
-    // Prioridad: digital reciente y series nuevas, luego trending como relleno
-    addMix(recentDigitalMovies);
+    addMix(digitalMovies);
     addMix(recentSeriesCatalog);
     addMix(trMovie);
     addMix(trTv);
     addMix(trAll);
+    addMix(popularMovie);
+    addMix(popularTv);
 
     const movies = mix.filter(function (x) { return x.type === 'movie'; });
     const series = mix.filter(function (x) { return x.type === 'series' || x.type === 'tv'; });
@@ -593,35 +671,29 @@ async function getHome() {
       if (i < movies.length) interleaved.push(movies[i]);
       if (i < series.length) interleaved.push(series[i]);
     }
-    pushRow(
-      'novedades',
-      'Novedades Â· ReciÃ©n en catÃ¡logo',
-      interleaved.length ? interleaved : mix,
-      'poster'
-    );
+    const novedadesItems = interleaved.length ? interleaved : mix;
+    // Forzar fila novedades aunque haga falta rellenar con trending
+    if (novedadesItems.length) {
+      rows.push({
+        id: 'novedades',
+        title: 'Novedades',
+        name: 'Novedades',
+        type: 'row',
+        layout: 'poster',
+        imageStyle: 'poster',
+        items: novedadesItems.slice(0, 20),
+      });
+    }
 
-    // Filas dedicadas para que el usuario vea claramente pelÃ­culas VOD y series nuevas
-    pushRow(
-      'recent_digital_movies',
-      'Nuevo en digital Â· PelÃ­culas',
-      recentDigitalMovies,
-      'poster'
-    );
-    pushRow(
-      'recent_series_catalog',
-      'Nuevo en catÃ¡logo Â· Series',
-      recentSeriesCatalog,
-      'poster'
-    );
-
-    // Sliders secundarios de contenido
-    pushRow('trending_movie', 'PelÃ­culas en tendencia', trMovie, 'poster');
+    pushRow('recent_digital_movies', 'Nuevo en digital - Peliculas', digitalMovies, 'poster');
+    pushRow('recent_series_catalog', 'Nuevo en catalogo - Series', recentSeriesCatalog, 'poster');
+    pushRow('trending_movie', 'Peliculas en tendencia', trMovie, 'poster');
     pushRow('trending_tv', 'Series en tendencia', trTv, 'poster');
-    pushRow('popular_movie', 'PelÃ­culas populares', popularMovie, 'poster');
+    pushRow('popular_movie', 'Peliculas populares', popularMovie, 'poster');
     pushRow('popular_tv', 'Series populares', popularTv, 'poster');
-    pushRow('top_movie', 'Mejor valoradas Â· Cine', topMovie, 'poster');
-    pushRow('top_tv', 'Mejor valoradas Â· Series', topTv, 'poster');
-    pushRow('on_air', 'Series en emisiÃ³n', onAir, 'poster');
+    pushRow('top_movie', 'Mejor valoradas - Cine', topMovie, 'poster');
+    pushRow('top_tv', 'Mejor valoradas - Series', topTv, 'poster');
+    pushRow('on_air', 'Series en emision', onAir, 'poster');
     if (nowPlaying && nowPlaying.length) {
       pushRow('now_playing', 'En cines', nowPlaying, 'poster');
     }
@@ -634,9 +706,9 @@ async function getHome() {
         fetchList('/discover/movie', digitalReleaseParams({ with_genres: 878, sort_by: 'popularity.desc', page: 1, region: region() }, false)),
         fetchList('/discover/tv', digitalReleaseParams({ with_genres: 18, sort_by: 'popularity.desc', page: 1 }, true)),
       ]);
-      pushRow('genre_action', 'AcciÃ³n', action, 'poster');
+      pushRow('genre_action', 'Accion', action, 'poster');
       pushRow('genre_comedy', 'Comedia', comedy, 'poster');
-      pushRow('genre_scifi', 'Ciencia ficciÃ³n', scifi, 'poster');
+      pushRow('genre_scifi', 'Ciencia ficcion', scifi, 'poster');
       pushRow('genre_drama_tv', 'Drama en series', dramaTv, 'poster');
     } catch (_) {}
 
@@ -660,7 +732,7 @@ async function getHome() {
       }
     }
 
-    // GÃ©neros Â· PelÃ­culas (catÃ¡logo con imagen del 1.er tÃ­tulo)
+    // GÃ©neros - PelÃ­culas (catÃ¡logo con imagen del 1.er tÃ­tulo)
     const genreMovieItems = [];
     for (let i = 0; i < MOVIE_GENRES.length; i += 6) {
       const chunk = MOVIE_GENRES.slice(i, i + 6);
@@ -672,6 +744,7 @@ async function getHome() {
         })
       );
       imgs.forEach(function (x) {
+        if (!x.img || !x.img.poster) return;
         genreMovieItems.push({
           id: 'genre_movie_' + x.g.id,
           contentId: 'genre_movie_' + x.g.id,
@@ -688,15 +761,15 @@ async function getHome() {
     }
     rows.push({
       id: 'catalogs_genres_movie',
-      title: 'GÃ©neros Â· PelÃ­culas',
-      name: 'GÃ©neros Â· PelÃ­culas',
+      title: 'Generos - Peliculas',
+      name: 'Generos - Peliculas',
       type: 'catalog',
       layout: 'catalog',
       imageStyle: 'backdrop',
       items: genreMovieItems,
     });
 
-    // GÃ©neros Â· Series
+    // GÃ©neros - Series
     const genreTvItems = [];
     for (let i = 0; i < TV_GENRES.length; i += 6) {
       const chunk = TV_GENRES.slice(i, i + 6);
@@ -708,6 +781,7 @@ async function getHome() {
         })
       );
       imgs.forEach(function (x) {
+        if (!x.img || !x.img.poster) return;
         genreTvItems.push({
           id: 'genre_tv_' + x.g.id,
           contentId: 'genre_tv_' + x.g.id,
@@ -724,8 +798,8 @@ async function getHome() {
     }
     rows.push({
       id: 'catalogs_genres_tv',
-      title: 'GÃ©neros Â· Series',
-      name: 'GÃ©neros Â· Series',
+      title: 'Generos - Series',
+      name: 'Generos - Series',
       type: 'catalog',
       layout: 'catalog',
       imageStyle: 'backdrop',
@@ -911,38 +985,38 @@ async function loadCollectionCover(collectionId) {
  */
 async function getCatalogs() {
   const catalogs = [
-    { id: 'trending_movie', title: 'PelÃ­culas en tendencia', type: 'movie', group: 'Destacados' },
+    { id: 'trending_movie', title: 'Peliculas en tendencia', type: 'movie', group: 'Destacados' },
     { id: 'trending_tv', title: 'Series en tendencia', type: 'series', group: 'Destacados' },
-    { id: 'popular_movie', title: 'PelÃ­culas populares', type: 'movie', group: 'Destacados' },
+    { id: 'popular_movie', title: 'Peliculas populares', type: 'movie', group: 'Destacados' },
     { id: 'popular_tv', title: 'Series populares', type: 'series', group: 'Destacados' },
-    { id: 'top_movie', title: 'PelÃ­culas mejor valoradas', type: 'movie', group: 'Destacados' },
+    { id: 'top_movie', title: 'Peliculas mejor valoradas', type: 'movie', group: 'Destacados' },
     { id: 'top_tv', title: 'Series mejor valoradas', type: 'series', group: 'Destacados' },
     { id: 'now_playing', title: 'En cines', type: 'movie', group: 'Destacados' },
-    { id: 'upcoming', title: 'PrÃ³ximos estrenos', type: 'movie', group: 'Destacados' },
-    { id: 'on_the_air', title: 'Series en emisiÃ³n', type: 'series', group: 'Destacados' },
+    { id: 'upcoming', title: 'Proximos estrenos', type: 'movie', group: 'Destacados' },
+    { id: 'on_the_air', title: 'Series en emision', type: 'series', group: 'Destacados' },
     { id: 'airing_today', title: 'Series hoy', type: 'series', group: 'Destacados' },
   ];
 
   for (const g of MOVIE_GENRES) {
     catalogs.push({
       id: 'genre_movie_' + g.id,
-      title: g.name + ' Â· PelÃ­culas',
+      title: g.name + ' - Peliculas',
       type: 'movie',
       genreId: g.id,
-      group: 'GÃ©neros cine',
+      group: 'Generos cine',
     });
   }
   for (const g of TV_GENRES) {
     catalogs.push({
       id: 'genre_tv_' + g.id,
-      title: g.name + ' Â· Series',
+      title: g.name + ' - Series',
       type: 'series',
       genreId: g.id,
-      group: 'GÃ©neros series',
+      group: 'Generos series',
     });
   }
 
-  // Franquicias / colecciones â€” portada = imagen de la colecciÃ³n TMDB
+  // Franquicias / colecciones - portada = imagen de la colecciÃ³n TMDB
   // Cargamos covers en paralelo (limitado) para no saturar
   const franchiseEntries = [];
   const batch = 8;
@@ -1013,7 +1087,7 @@ async function getCatalog(catalogId, opts) {
         totalPages,
         hasMore: page < totalPages,
         catalogId: cid,
-        title: data.name || 'ColecciÃ³n',
+        title: data.name || 'Coleccion',
         // Portada del catÃ¡logo = imagen de la franquicia
         poster: coverPoster,
         cover: coverPoster,
@@ -1154,9 +1228,10 @@ async function getCatalog(catalogId, opts) {
     }
 
     const data = await tmdbFetch(path, params);
-    const items = (data.results || []).map((r) =>
+    let items = (data.results || []).map((r) =>
       mapTmdbItem(r, typeHint === 'tv' ? 'tv' : 'movie')
     );
+    items = filterDisplayItems(items);
     const totalPages = data.total_pages || 1;
     return {
       items,
@@ -1180,7 +1255,7 @@ async function getCatalog(catalogId, opts) {
 async function getDiscoverFilters() {
   // La app solo muestra hasta 3 filtros, cada uno con { id, label, options:[{id,label}] }
   const typeOpts = [
-    { id: 'movie', label: 'PelÃ­culas' },
+    { id: 'movie', label: 'Peliculas' },
     { id: 'tv', label: 'Series' },
   ];
 
@@ -1196,20 +1271,20 @@ async function getDiscoverFilters() {
     .concat(genreTv.map(function (g) { return { id: g.id, label: 'Ã°Å¸â€œÂº ' + g.label }; }));
 
   const sortOpts = [
-    { id: 'popularity.desc', label: 'Popularidad â†“' },
-    { id: 'popularity.asc', label: 'Popularidad â†‘' },
-    { id: 'vote_average.desc', label: 'ValoraciÃ³n â†“' },
-    { id: 'vote_average.asc', label: 'ValoraciÃ³n â†‘' },
-    { id: 'date.desc', label: 'Fecha â†“' },
-    { id: 'date.asc', label: 'Fecha â†‘' },
-    { id: 'title.asc', label: 'TÃ­tulo Aâ€“Z' },
-    { id: 'title.desc', label: 'TÃ­tulo Zâ€“A' },
-    { id: 'revenue.desc', label: 'RecaudaciÃ³n â†“' },
+    { id: 'popularity.desc', label: 'Popularidad -' },
+    { id: 'popularity.asc', label: 'Popularidad +' },
+    { id: 'vote_average.desc', label: 'Valoracion -' },
+    { id: 'vote_average.asc', label: 'Valoracion +' },
+    { id: 'date.desc', label: 'Fecha -' },
+    { id: 'date.asc', label: 'Fecha +' },
+    { id: 'title.asc', label: 'Titulo A-Z' },
+    { id: 'title.desc', label: 'Titulo Z-A' },
+    { id: 'revenue.desc', label: 'Recaudacion -' },
   ];
 
   return [
     { id: 'type', label: 'Tipo', options: typeOpts },
-    { id: 'genre', label: 'GÃ©nero', options: genreOpts },
+    { id: 'genre', label: 'Genero', options: genreOpts },
     { id: 'sort', label: 'Ordenar', options: sortOpts },
   ];
 }
@@ -1267,9 +1342,10 @@ async function getDiscover(opts) {
     90e3,
     async () => {
       const data = await tmdbFetch(path, params);
-      const items = (data.results || []).map((r) =>
+      let items = (data.results || []).map((r) =>
         mapTmdbItem(r, type === 'tv' ? 'tv' : 'movie')
       );
+      items = filterDisplayItems(items);
       const totalPages = data.total_pages || 1;
       return {
         items: items,
@@ -1359,7 +1435,7 @@ async function getMeta(id, options) {
       }
 
       const isTv = mediaType === 'tv';
-      const title = data.title || data.name || 'Sin tÃ­tulo';
+      const title = data.title || data.name || 'Sin titulo';
       const year = String(data.release_date || data.first_air_date || '').slice(0, 4);
       const genres = (data.genres || []).map((g) => g.name);
       const imdb = (data.external_ids && data.external_ids.imdb_id) || null;
@@ -1452,7 +1528,7 @@ async function getMeta(id, options) {
         seasons.sort((a, b) => a.number - b.number);
       }
 
-      // Intro/outro a nivel meta (pelÃ­cula) â€” el player tambiÃ©n los pide en streams
+      // Intro/outro a nivel meta (pelÃ­cula) - el player tambiÃ©n los pide en streams
       let segments = null;
       if (imdb) {
         try {
@@ -1692,9 +1768,9 @@ function normalizeOpenSubs(json, season, episode) {
     const release = s.movieReleaseName || s.releaseGroup || '';
     let label = 'SPA';
     if (fileName) {
-      label = 'SPA Â· ' + String(fileName).replace(/\.srt$/i, '').slice(0, 48);
+      label = 'SPA - ' + String(fileName).replace(/\.srt$/i, '').slice(0, 48);
     } else if (release) {
-      label = 'SPA Â· ' + String(release).slice(0, 40);
+      label = 'SPA - ' + String(release).slice(0, 40);
     }
     let format = 'srt';
     const lower = url.toLowerCase() + ' ' + String(fileName).toLowerCase();
@@ -1732,9 +1808,10 @@ async function search(query) {
       include_adult: false,
       page: 1,
     });
-    const items = (data.results || [])
+    let items = (data.results || [])
       .filter((r) => r.media_type === 'movie' || r.media_type === 'tv')
       .map((r) => mapTmdbItem(r, r.media_type));
+    items = filterDisplayItems(items);
     return { items, metas: items, results: items };
   });
 }
@@ -1880,7 +1957,7 @@ async function getStreams(id, type, season, episode) {
     return ALL_EXTRACTORS.indexOf(String(n).toLowerCase()) !== -1;
   });
   if (!names.length) {
-    console.warn('[getStreams] ningÃºn extractor activo en config â€” no se buscarÃ¡n servidores');
+    console.warn('[getStreams] ningÃºn extractor activo en config - no se buscarÃ¡n servidores');
     return [];
   }
   console.log('[getStreams] buscando SOLO en: ' + names.join(', '));
@@ -1963,10 +2040,10 @@ async function getStreams(id, type, season, episode) {
     return [
       {
         name: 'IntroDB / Subs only',
-        title: 'Sin servidores â€” segmentos/subtÃ­tulos disponibles',
+        title: 'Sin servidores - segmentos/subtÃ­tulos disponibles',
         url: 'https://example.invalid/no-stream',
         quality: 'N/A',
-        language: 'â€”',
+        language: '-',
         segments: streamSegments || undefined,
         skip: streamSegments || undefined,
         markers: streamSegments || undefined,
