@@ -1,8 +1,8 @@
 {
   "id": "tmdb-full-catalog",
   "name": "TMDB Full Catalog",
-  "version": "1.2.2",
-  "description": "Catálogo completo TMDB: home con catálogos de géneros y franquicias, discover, meta+IntroDB y extractores latinos.",
+  "version": "1.3.0",
+  "description": "Catálogo completo TMDB: home con géneros, franquicias, directores y actores; discover; meta+IntroDB; extractores latinos configurables por checkbox.",
   "author": "community",
   "repo": "tmdb-full-catalog",
   "entry": "plugin.js",
@@ -199,17 +199,151 @@
       ]
     },
     {
-      "key": "enabled_sources",
-      "label": "Extractores activos (coma)",
-      "type": "text",
-      "default": "embed69,homecine,seriesmetro,cinecalidad,verpelis,vimeus,lamovie,elifilms,tioplus,cine24h,cinemitas,hackstore,areshd,sololatino,pelisgratishd,peliculasflix,entrepeliculasyseries,pelisgo,fuegocine",
-      "description": "Quita nombres para desactivar servidores."
-    },
-    {
       "key": "max_concurrent_sources",
       "label": "Extractores en paralelo",
       "type": "number",
       "default": "4"
+    },
+    {
+      "key": "source_embed69",
+      "label": "Usar embed69",
+      "type": "checkbox",
+      "default": "true",
+      "description": "Activar servidor/extractor embed69"
+    },
+    {
+      "key": "source_homecine",
+      "label": "Usar homecine",
+      "type": "checkbox",
+      "default": "true",
+      "description": "Activar servidor/extractor homecine"
+    },
+    {
+      "key": "source_seriesmetro",
+      "label": "Usar seriesmetro",
+      "type": "checkbox",
+      "default": "true",
+      "description": "Activar servidor/extractor seriesmetro"
+    },
+    {
+      "key": "source_cinecalidad",
+      "label": "Usar cinecalidad",
+      "type": "checkbox",
+      "default": "true",
+      "description": "Activar servidor/extractor cinecalidad"
+    },
+    {
+      "key": "source_verpelis",
+      "label": "Usar verpelis",
+      "type": "checkbox",
+      "default": "true",
+      "description": "Activar servidor/extractor verpelis"
+    },
+    {
+      "key": "source_vimeus",
+      "label": "Usar vimeus",
+      "type": "checkbox",
+      "default": "true",
+      "description": "Activar servidor/extractor vimeus"
+    },
+    {
+      "key": "source_lamovie",
+      "label": "Usar lamovie",
+      "type": "checkbox",
+      "default": "true",
+      "description": "Activar servidor/extractor lamovie"
+    },
+    {
+      "key": "source_elifilms",
+      "label": "Usar elifilms",
+      "type": "checkbox",
+      "default": "true",
+      "description": "Activar servidor/extractor elifilms"
+    },
+    {
+      "key": "source_tioplus",
+      "label": "Usar tioplus",
+      "type": "checkbox",
+      "default": "true",
+      "description": "Activar servidor/extractor tioplus"
+    },
+    {
+      "key": "source_cine24h",
+      "label": "Usar cine24h",
+      "type": "checkbox",
+      "default": "true",
+      "description": "Activar servidor/extractor cine24h"
+    },
+    {
+      "key": "source_cinemitas",
+      "label": "Usar cinemitas",
+      "type": "checkbox",
+      "default": "true",
+      "description": "Activar servidor/extractor cinemitas"
+    },
+    {
+      "key": "source_hackstore",
+      "label": "Usar hackstore",
+      "type": "checkbox",
+      "default": "true",
+      "description": "Activar servidor/extractor hackstore"
+    },
+    {
+      "key": "source_areshd",
+      "label": "Usar areshd",
+      "type": "checkbox",
+      "default": "true",
+      "description": "Activar servidor/extractor areshd"
+    },
+    {
+      "key": "source_sololatino",
+      "label": "Usar sololatino",
+      "type": "checkbox",
+      "default": "true",
+      "description": "Activar servidor/extractor sololatino"
+    },
+    {
+      "key": "source_pelisgratishd",
+      "label": "Usar pelisgratishd",
+      "type": "checkbox",
+      "default": "true",
+      "description": "Activar servidor/extractor pelisgratishd"
+    },
+    {
+      "key": "source_peliculasflix",
+      "label": "Usar peliculasflix",
+      "type": "checkbox",
+      "default": "true",
+      "description": "Activar servidor/extractor peliculasflix"
+    },
+    {
+      "key": "source_entrepeliculasyseries",
+      "label": "Usar entrepeliculasyseries",
+      "type": "checkbox",
+      "default": "true",
+      "description": "Activar servidor/extractor entrepeliculasyseries"
+    },
+    {
+      "key": "source_pelisgo",
+      "label": "Usar pelisgo",
+      "type": "checkbox",
+      "default": "true",
+      "description": "Activar servidor/extractor pelisgo"
+    },
+    {
+      "key": "source_fuegocine",
+      "label": "Usar fuegocine",
+      "type": "checkbox",
+      "default": "true",
+      "description": "Activar servidor/extractor fuegocine"
+    },
+    {
+      "key": "enabled_sources",
+      "label": "Override extractores (coma, opcional)",
+      "type": "text",
+      "default": "",
+      "placeholder": "Vacío = usar checkboxes",
+      "description": "Si lo rellenas, ignora los checkboxes y usa solo esta lista separada por comas."
     }
   ]
 }
